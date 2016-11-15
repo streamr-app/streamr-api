@@ -13,14 +13,9 @@ defmodule Streamr.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", Streamr do
-    pipe_through :browser # Use the default browser stack
+  scope "/api/v1", Streamr do
+    pipe_through :api
 
-    get "/", PageController, :index
+    post "/users/new", UserController, :create
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", Streamr do
-  #   pipe_through :api
-  # end
 end
