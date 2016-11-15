@@ -1,4 +1,5 @@
 # Streamr
+[![Build Status](https://travis-ci.org/zebras-filming-videos/streamr-api.svg)](https://travis-ci.org/zebras-filming-videos/streamr-api)
 
 To start your Phoenix app:
 
