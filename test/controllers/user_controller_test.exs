@@ -1,23 +1,26 @@
 defmodule Streamr.UserControllerTest do
   use Streamr.ConnCase
 
-  @valid_user_attrs %{name: "Foo Bar", email: "foo@bar.com", password: "password"}
-  @invalid_user_attrs %{name: "Foo Bar", email: nil, password: "password"}
+  import Streamr.Factory
 
   describe "POST /users/new" do
     test "with valid user data", %{conn: conn} do
-      conn = post conn, "api/v1/users/new", %{"user" => @valid_user_attrs}
+      valid_user = params_for(:user)
+
+      conn = post conn, "api/v1/users/new", %{"user" => valid_user}
       body = json_response(conn, 201)
 
       assert body["data"]["id"]
-      assert body["data"]["attributes"]["email"] == "foo@bar.com"
-      assert body["data"]["attributes"]["name"] == "Foo Bar"
+      assert body["data"]["attributes"]["email"] == valid_user.email
+      assert body["data"]["attributes"]["name"] == valid_user.name
       refute body["data"]["attributes"]["password"]
       refute body["data"]["attributes"]["password_hash"]
     end
 
     test "with invalid data", %{conn: conn} do
-      conn = post conn, "api/v1/users/new", %{"user" => @invalid_user_attrs}
+      invalid_user = params_for(:user, email: nil)
+
+      conn = post conn, "api/v1/users/new", %{"user" => invalid_user}
       body = json_response(conn, 422)["errors"]
       assert body == [%{
         "detail" => "Email can't be blank",
@@ -26,11 +29,13 @@ defmodule Streamr.UserControllerTest do
     end
 
     test "when a user exists with the email", %{conn: conn} do
-      conn = post conn, "api/v1/users/new", %{"user" => @valid_user_attrs}
+      valid_user = params_for(:user)
+
+      conn = post conn, "api/v1/users/new", %{"user" => valid_user}
       json_response(conn, 201)
 
       conn = build_conn()
-      conn = post conn, "api/v1/users/new", %{"user" => @valid_user_attrs}
+      conn = post conn, "api/v1/users/new", %{"user" => valid_user}
 
       body = json_response(conn, 422)["errors"]
       assert body == [%{
