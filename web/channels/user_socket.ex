@@ -1,10 +1,10 @@
 defmodule Streamr.UserSocket do
   use Phoenix.Socket
 
-  ## Channels
+  # Channels
   # channel "room:*", Streamr.RoomChannel
 
-  ## Transports
+  # Transports
   transport :websocket, Phoenix.Transports.WebSocket
   # transport :longpoll, Phoenix.Transports.LongPoll
 
