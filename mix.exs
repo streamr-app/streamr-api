@@ -42,6 +42,7 @@ defmodule Streamr.Mixfile do
      {:ja_serializer, "~> 0.11.1"},
      {:guardian, "~> 0.13.0"},
      {:ex_machina, "~> 1.0", only: :test},
+     {:cors_plug, "~> 1.1"},
      {:dogma, "~> 0.1", only: :dev}]
   end
 

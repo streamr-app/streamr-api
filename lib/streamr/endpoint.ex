@@ -38,5 +38,7 @@ defmodule Streamr.Endpoint do
     key: "_streamr_key",
     signing_salt: "HD/fx8bR"
 
+  plug CORSPlug
+
   plug Streamr.Router
 end
