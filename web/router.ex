@@ -18,7 +18,7 @@ defmodule Streamr.Router do
   scope "/api/v1", Streamr do
     pipe_through :api
 
-    post "/users", UserController, :create
+    resources "/users", UserController, only: [:create]
     post "/users/auth", UserController, :auth
   end
 end
