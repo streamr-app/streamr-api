@@ -13,7 +13,7 @@ defmodule Streamr.User do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, ~w(name email), [])
-    |> validate_length(:email, min: 1, max: 20)
+    |> validate_length(:email, min: 1, max: 254)
     |> validate_email_uniqueness
   end
 
@@ -21,7 +21,7 @@ defmodule Streamr.User do
     model
     |> changeset(params)
     |> cast(params, ~w(password), [])
-    |> validate_length(:password, min: 6, max: 100)
+    |> validate_length(:password, min: 6)
     |> put_pass_hash()
   end
 
