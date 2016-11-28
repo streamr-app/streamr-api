@@ -9,4 +9,16 @@ defmodule Streamr.Factory do
       password: "password"
     }
   end
+
+  def refresh_token_factory do
+    %Streamr.RefreshToken{
+      user: build(:user),
+      token: sequence(:token, &"token-#{&1}")
+    }
+  end
+
+  def set_password(user, password) do
+    hashed_password = Comeonin.Bcrypt.hashpwsalt(password)
+    %{user | password_hash: hashed_password}
+  end
 end

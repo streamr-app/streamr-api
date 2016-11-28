@@ -25,6 +25,18 @@ defmodule Streamr.User do
     |> put_pass_hash()
   end
 
+  def find_and_confirm_password(email, password) do
+    user = Streamr.Repo.get_by(Streamr.User, email: email)
+
+    cond do
+      user && Comeonin.Bcrypt.checkpw(password, user.password_hash) ->
+        {:ok, user}
+      true ->
+        Comeonin.Bcrypt.dummy_checkpw()
+        {:error, nil}
+    end
+  end
+
   defp put_pass_hash(changeset) do
     case changeset do
       %Ecto.Changeset{valid?: true, changes: %{password: pass}} ->
