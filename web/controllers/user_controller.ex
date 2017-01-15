@@ -18,7 +18,7 @@ defmodule Streamr.UserController do
     end
   end
 
-  def auth(conn, %{"email" => email, "password" => password, "grant_type" => "password"}) do
+  def auth(conn, %{"username" => email, "password" => password, "grant_type" => "password"}) do
     case User.find_and_confirm_password(email, password) do
       {:ok, user} ->
         {new_conn, jwt} = generate_access_token(conn, user)

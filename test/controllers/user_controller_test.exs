@@ -59,7 +59,7 @@ defmodule Streamr.UserControllerTest do
       conn = post(
         build_conn(),
         "api/v1/users/auth",
-        %{email: context[:user].email, password: context[:user].password, grant_type: "password"}
+        %{username: context[:user].email, password: context[:user].password, grant_type: "password"}
       )
 
       body = json_response(conn, 200)
@@ -74,7 +74,7 @@ defmodule Streamr.UserControllerTest do
       conn = post(
         build_conn(),
         "api/v1/users/auth",
-        %{email: "foo@bar.com", password: "INVALID PASSWORD", grant_type: "password"}
+        %{username: "foo@bar.com", password: "INVALID PASSWORD", grant_type: "password"}
       )
 
       body = json_response(conn, 401)["errors"]
