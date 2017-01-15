@@ -17,6 +17,14 @@ defmodule Streamr.Factory do
     }
   end
 
+  def stream_factory do
+    %Streamr.Stream{
+      user: build(:user),
+      title: sequence(:title, &"title-#{&1}"),
+      description: sequence(:description, &"description-#{&1}")
+    }
+  end
+
   def set_password(user, password) do
     hashed_password = Comeonin.Bcrypt.hashpwsalt(password)
     %{user | password_hash: hashed_password}
