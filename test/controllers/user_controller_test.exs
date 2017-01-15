@@ -121,4 +121,28 @@ defmodule Streamr.UserControllerTest do
         }]
     end
   end
+
+  describe "GET /api/v1/users/email_available" do
+    test "when the email has already been taken by another user" do
+      user = insert(:user)
+
+      conn = get(
+        build_conn(),
+        "api/v1/users/email_available",
+        %{email: user.email}
+      )
+
+      assert %{"email_available" => false} == json_response(conn, 200)
+    end
+
+    test "when the email has not been taken by another user" do
+      conn = get(
+        build_conn(),
+        "api/v1/users/email_available",
+        %{email: "new-email@example.com"}
+      )
+
+      assert %{"email_available" => true} == json_response(conn, 200)
+    end
+  end
 end

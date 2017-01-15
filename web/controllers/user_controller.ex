@@ -47,6 +47,11 @@ defmodule Streamr.UserController do
     end
   end
 
+  def email_available(conn, %{"email" => email}) do
+    conn
+    |> render("email_available.json", email_available: !Repo.get_by(User, email: email))
+  end
+
   defp generate_access_token(conn, user) do
     new_conn = Guardian.Plug.api_sign_in(conn, user)
     jwt = Guardian.Plug.current_token(new_conn)

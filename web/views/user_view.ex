@@ -34,4 +34,8 @@ defmodule Streamr.UserView do
         detail: "Invalid refresh token",
         status: 401}]}
   end
+
+  def render("email_available.json", %{email_available: email_available}) do
+    %{email_available: email_available}
+  end
 end
