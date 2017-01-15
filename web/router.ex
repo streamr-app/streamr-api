@@ -11,7 +11,7 @@ defmodule Streamr.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
-    plug Guardian.Plug.VerifyHeader
+    plug Guardian.Plug.VerifyHeader, realm: "Bearer"
     plug Guardian.Plug.LoadResource
   end
 
@@ -21,6 +21,7 @@ defmodule Streamr.Router do
     resources "/users", UserController, only: [:create]
     post "/users/auth", UserController, :auth
     get "/users/email_available", UserController, :email_available
+    get "/users/me", UserController, :me
 
     resources "/streams", StreamController, only: [:index]
   end

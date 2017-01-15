@@ -145,4 +145,25 @@ defmodule Streamr.UserControllerTest do
       assert %{"email_available" => true} == json_response(conn, 200)
     end
   end
+
+  describe "GET /api/v1/users/me" do
+    test "when the user is authenticated" do
+      user = insert(:user)
+      conn = build_conn()
+             |> Guardian.Plug.api_sign_in(user)
+             |> get("/api/v1/users/me")
+
+      body = json_response(conn, 200)["data"]
+
+      assert body["id"] == Integer.to_string(user.id)
+      assert body["attributes"]["email"] == user.email
+      assert body["attributes"]["name"] == user.name
+    end
+
+    test "when there is no authentication" do
+      conn = build_conn() |> get("/api/v1/users/me")
+
+      json_response(conn, 401)
+    end
+  end
 end

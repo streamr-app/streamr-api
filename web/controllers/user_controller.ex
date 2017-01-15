@@ -1,5 +1,6 @@
 defmodule Streamr.UserController do
   use Streamr.Web, :controller
+  plug Streamr.Authenticate when action in [:me]
   alias Streamr.{User, RefreshToken, Repo}
 
   def create(conn, %{"user" => user_params}) do
@@ -50,6 +51,10 @@ defmodule Streamr.UserController do
   def email_available(conn, %{"email" => email}) do
     conn
     |> render("email_available.json", email_available: !Repo.get_by(User, email: email))
+  end
+
+  def me(conn, _assigns) do
+    render(conn, "show.json-api", data: Guardian.Plug.current_resource(conn))
   end
 
   defp generate_access_token(conn, user) do
