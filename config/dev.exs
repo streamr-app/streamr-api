@@ -36,8 +36,6 @@ config :phoenix, :stacktrace_depth, 20
 # Configure your database
 config :streamr, Streamr.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
   database: "streamr_dev",
   hostname: "localhost",
   pool_size: 10
