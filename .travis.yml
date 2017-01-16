@@ -6,3 +6,8 @@ otp_release:
 script:
   - mix test
   - mix dogma
+
+cache:
+  directories:
+    - _build
+    - deps
