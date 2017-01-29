@@ -24,5 +24,7 @@ defmodule Streamr.Router do
     get "/users/me", UserController, :me
 
     resources "/streams", StreamController, only: [:index]
+
+    resources "/topics", TopicController, only: [:index]
   end
 end

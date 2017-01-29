@@ -25,6 +25,12 @@ defmodule Streamr.Factory do
     }
   end
 
+  def topic_factory do
+    %Streamr.Topic{
+      name: sequence(:name, &"topic-#{&1}")
+    }
+  end
+
   def set_password(user, password) do
     hashed_password = Comeonin.Bcrypt.hashpwsalt(password)
     %{user | password_hash: hashed_password}
