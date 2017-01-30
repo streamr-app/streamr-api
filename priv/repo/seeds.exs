@@ -26,7 +26,7 @@ Repo.insert! %Topic{name: "Computer Science"}
 Repo.insert! %Topic{name: "Cosmology & Astronomy"}
 Repo.insert! %Topic{name: "Electrical Engineering"}
 Repo.insert! %Topic{name: "Entrepreneurship"}
-Repo.insert! %Topic{name: "Finance & capital Markets"}
+Repo.insert! %Topic{name: "Finance & Capital Markets"}
 Repo.insert! %Topic{name: "Grammar"}
 Repo.insert! %Topic{name: "Health & Medicine"}
 Repo.insert! %Topic{name: "Macroeconomics"}
