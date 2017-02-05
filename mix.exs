@@ -60,8 +60,9 @@ defmodule Streamr.Mixfile do
       {:cors_plug, "~> 1.1"},
       {:dogma, "~> 0.1", only: :dev},
       {:scrivener_ecto, "~> 1.0"},
-      {:scrivener, "~> 2.0"}
-   ]
+      {:scrivener, "~> 2.0"},
+      {:slugger, "~> 0.1.0"}
+    ]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
