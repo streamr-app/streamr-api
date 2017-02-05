@@ -13,11 +13,9 @@ defmodule Streamr.Stream do
   end
 
   def with_users(query) do
-    from(
-      stream in query,
-      preload: [:user],
-      select: stream
-    )
+    from stream in query,
+    preload: [:user],
+    select: stream
   end
 
   def ordered(query) do
