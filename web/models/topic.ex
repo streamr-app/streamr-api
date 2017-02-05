@@ -6,4 +6,9 @@ defmodule Streamr.Topic do
 
     timestamps
   end
+
+  def ordered(query) do
+    from topic in query,
+    order_by: [asc: topic.name]
+  end
 end
