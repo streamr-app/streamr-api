@@ -2,6 +2,7 @@ defmodule Streamr.UserControllerTest do
   use Streamr.ConnCase
 
   import Streamr.Factory
+  import Swoosh.TestAssertions
 
   describe "POST /users" do
     test "with valid user data", %{conn: conn} do
@@ -15,6 +16,13 @@ defmodule Streamr.UserControllerTest do
       assert body["data"]["attributes"]["name"] == valid_user.name
       refute body["data"]["attributes"]["password"]
       refute body["data"]["attributes"]["password_hash"]
+    end
+
+    test "with valid user data, sends email for verification", %{conn: conn} do
+      valid_user = params_for(:user)
+
+      post conn, "api/v1/users", %{"user" => valid_user}
+      assert_email_sent Streamr.Email.welcome(valid_user)
     end
 
     test "with invalid data", %{conn: conn} do

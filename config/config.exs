@@ -17,6 +17,12 @@ config :streamr, Streamr.Endpoint,
   pubsub: [name: Streamr.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
+# Configures the mailer
+config :streamr, Streamr.Mailer,
+  adapter: Swoosh.Adapters.Mailgun,
+  api_key: System.get_env("MAILGUN_API_KEY"),
+  domain: "sandboxd11cf256d75a44d0bb0d42d938bae558.mailgun.org"
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

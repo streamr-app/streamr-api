@@ -30,6 +30,8 @@ defmodule Streamr.Mixfile do
          :comeonin,
          :ja_serializer,
          :guardian,
+         :phoenix_swoosh,
+         :swoosh,
          :scrivener_ecto,
          :scrivener
        ]
@@ -59,6 +61,8 @@ defmodule Streamr.Mixfile do
       {:ex_machina, "~> 1.0", only: :test},
       {:cors_plug, "~> 1.1"},
       {:dogma, "~> 0.1", only: :dev},
+      {:swoosh,  "~> 0.5.0"},
+      {:phoenix_swoosh,  "~> 0.1.3"},
       {:scrivener_ecto, "~> 1.0"},
       {:scrivener, "~> 2.0"},
       {:slugger, "~> 0.1.0"}

@@ -1,13 +1,15 @@
 defmodule Streamr.UserController do
   use Streamr.Web, :controller
   plug Streamr.Authenticate when action in [:me]
-  alias Streamr.{User, RefreshToken, Repo}
+  alias Streamr.{User, RefreshToken, Repo, Mailer, Email}
 
   def create(conn, %{"user" => user_params}) do
     changeset = User.registration_changeset(%User{}, user_params)
 
     case Repo.insert(changeset) do
       {:ok, user} ->
+        send_welcome_email(user)
+
         conn
         |> put_status(201)
         |> render("show.json-api", data: user)
@@ -62,5 +64,11 @@ defmodule Streamr.UserController do
     jwt = Guardian.Plug.current_token(new_conn)
 
     {new_conn, jwt}
+  end
+
+  defp send_welcome_email(user) do
+    user
+    |> Email.welcome
+    |> Mailer.deliver
   end
 end

@@ -9,6 +9,10 @@ config :streamr, Streamr.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warn
 
+# Configured for Mail T
+config :streamr, Streamr.Mailer,
+  adapter: Swoosh.Adapters.Test
+
 # Configure your database
 config :streamr, Streamr.Repo,
   adapter: Ecto.Adapters.Postgres,
