@@ -10,7 +10,7 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-alias Streamr.{Repo, Topic, Stream}
+alias Streamr.{Repo, Topic, Stream, Color, StreamData}
 
 defmodule SeedHelpers do
   def aws_url(path) do
@@ -36,6 +36,7 @@ Repo.insert! %Topic{name: "Physics"}
 Repo.insert! %Topic{name: "US History"}
 Repo.insert! %Topic{name: "World History"}
 
+Repo.delete_all StreamData
 Repo.delete_all Stream
 Repo.insert! %Stream{
   title: "Electic Charge, Fields, and Potential pt. 1",
@@ -83,4 +84,40 @@ Repo.insert! %Stream{
   title: "R-squared Coefficient",
   image: SeedHelpers.aws_url("Screen+Shot+2017-01-29+at+6.38.11+PM.png"),
   user_id: 1
+}
+
+# Blue
+Repo.insert! %Color{
+  normal: "#61afef"m
+  order: 5
+}
+
+# Red
+Repo.insert! %Color{
+  normal: "#e06c75",
+  order: 2
+}
+
+# Green
+Repo.insert! %Color{
+  normal: "#98c379",
+  order: 4
+}
+
+# Purps
+Repo.insert! %Color{
+  normal: "#c678dd",
+  order: 6
+}
+
+# Orange
+Repo.insert! %Color{
+  normal: "#d19a66",
+  order: 3
+}
+
+# White
+Repo.insert! %Color{
+  normal: "#abb2bf",
+  order: 1
 }

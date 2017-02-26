@@ -54,6 +54,15 @@ defmodule Streamr.Factory do
     }
   end
 
+  def color_factory do
+    %Streamr.Color{
+      normal: "red",
+      deuteranopia: "Foodelooap",
+      protanopia: "foobie doo",
+      tritanopia: "foobarb pie"
+    }
+  end
+
   def set_password(user, password) do
     hashed_password = Comeonin.Bcrypt.hashpwsalt(password)
     %{user | password_hash: hashed_password}

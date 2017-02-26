@@ -28,5 +28,7 @@ defmodule Streamr.Router do
     end
 
     resources "/topics", TopicController, only: [:index]
+
+    resources "/colors", ColorController, only: [:index]
   end
 end
