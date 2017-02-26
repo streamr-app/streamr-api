@@ -29,6 +29,18 @@ defmodule Streamr.ConnCase do
 
       # The default endpoint for testing
       @endpoint Streamr.Endpoint
+
+      def post_authorized(user, endpoint, body \\ %{}) do
+        build_conn()
+        |> Guardian.Plug.api_sign_in(user)
+        |> post(endpoint, body)
+      end
+
+      def get_authorized(user, endpoint, body \\ %{}) do
+        build_conn()
+        |> Guardian.Plug.api_sign_in(user)
+        |> get(endpoint, body)
+      end
     end
   end
 

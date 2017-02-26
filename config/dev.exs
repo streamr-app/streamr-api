@@ -39,3 +39,12 @@ config :streamr, Streamr.Repo,
   database: "streamr_dev",
   hostname: "localhost",
   pool_size: 10
+
+config :guardian, Guardian,
+  issuer: "Streamr",
+  ttl: { 1, :hours },
+  secret_key: %{
+    "k" => "GsPWQavhykT1qWmuetx6FY2LJo5xMlhQ+2jmlhtLHUvcarl5Rq/RniIXcF1J07j4",
+    "kty" => "oct"
+  },
+  serializer: Streamr.GuardianSerializer

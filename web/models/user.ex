@@ -6,6 +6,7 @@ defmodule Streamr.User do
     field :email, :string
     field :password, :string, virtual: true
     field :password_hash, :string
+    has_many :streams, Streamr.Stream
 
     timestamps
   end

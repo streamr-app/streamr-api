@@ -19,3 +19,12 @@ config :streamr, Streamr.Repo,
   database: "streamr_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :guardian, Guardian,
+  issuer: "Streamr",
+  ttl: { 1, :hours },
+  secret_key: %{
+    "k" => "EBGUmyGGsg8tJpkmLT5RnGIjNvmayBFMaZTW020EKLffg1SQE5IDvqSbK1B0TGQh",
+    "kty" => "oct"
+  },
+  serializer: Streamr.GuardianSerializer

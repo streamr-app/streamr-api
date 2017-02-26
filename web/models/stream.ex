@@ -2,14 +2,20 @@ defmodule Streamr.Stream do
   use Streamr.Web, :model
   import Ecto.Query
 
-
   schema "streams" do
-    belongs_to :user, Streamr.User
     field :title, :string, null: false
     field :description, :string
     field :image, :string
 
+    belongs_to :user, Streamr.User
+    has_one :stream_data, Streamr.StreamData
+
     timestamps
+  end
+
+  def changeset(model, params \\ :empty) do
+    model
+    |> cast(params, ~w(title), ~w(description))
   end
 
   def with_users(query) do

@@ -6,3 +6,5 @@ otp_release:
 script:
   - mix test
   - mix dogma
+addons:
+  postgresql: 9.5
