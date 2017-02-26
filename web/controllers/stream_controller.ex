@@ -33,6 +33,14 @@ defmodule Streamr.StreamController do
     end
   end
 
+  def show(conn, %{"id" => slug}) do
+    stream = Stream
+             |> Repo.get_by_slug(slug)
+             |> Repo.preload(:user)
+
+    render conn, "show.json-api", data: stream
+  end
+
   def add_line(conn, params) do
     stream = get_stream(params)
 
