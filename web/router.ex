@@ -18,10 +18,10 @@ defmodule Streamr.Router do
   scope "/api/v1", Streamr do
     pipe_through :api
 
-    resources "/users", UserController, only: [:create]
     post "/users/auth", UserController, :auth
     get "/users/email_available", UserController, :email_available
     get "/users/me", UserController, :me
+    resources "/users", UserController, only: [:create, :show]
 
     resources "/streams", StreamController, only: [:index, :create, :show] do
       post "/add_line", StreamController, :add_line

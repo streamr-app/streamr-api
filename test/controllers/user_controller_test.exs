@@ -53,6 +53,21 @@ defmodule Streamr.UserControllerTest do
     end
   end
 
+  describe "GET /users/:id" do
+    test "get a user's profile" do
+      user = insert(:user)
+
+      conn = get(
+        build_conn(),
+        "/api/v1/users/#{user.id}"
+      )
+
+      response = json_response(conn, 200)["data"]
+
+      assert String.to_integer(response["id"]) == user.id
+    end
+  end
+
   describe "POST /users/auth (password grant type)" do
     setup do
       user = :user

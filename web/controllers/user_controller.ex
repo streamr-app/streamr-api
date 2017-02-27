@@ -21,6 +21,10 @@ defmodule Streamr.UserController do
     end
   end
 
+  def show(conn, %{"id" => user_id}) do
+    render conn, "show.json-api", data: Repo.get(User, user_id)
+  end
+
   def auth(conn, %{"username" => email, "password" => password, "grant_type" => "password"}) do
     case User.find_and_confirm_password(email, password) do
       {:ok, user} ->
