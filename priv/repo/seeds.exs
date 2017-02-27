@@ -88,7 +88,7 @@ Repo.insert! %Stream{
 
 # Blue
 Repo.insert! %Color{
-  normal: "#61afef"m
+  normal: "#61afef",
   order: 5
 }
 
