@@ -15,7 +15,8 @@ defmodule Streamr.Stream do
 
   def changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(title), ~w(description))
+    |> cast(params, [:title, :description])
+    |> validate_required([:title])
   end
 
   def with_users(query) do

@@ -38,7 +38,8 @@ defmodule Streamr.RefreshToken do
     params = %{user_id: user.id, token: Streamr.SecureRandom.base64(256)}
 
     %RefreshToken{}
-    |> cast(params, ~w(token user_id), [])
+    |> cast(params, [:token, :user_id])
+    |> validate_required([:token, :user_id])
   end
 
   defp remove_oldeset_token(user) do

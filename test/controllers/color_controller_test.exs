@@ -3,8 +3,6 @@ defmodule Streamr.ColorControllerTest do
 
   import Streamr.Factory
 
-  alias Streamr.{Repo, Color}
-
   describe "GET /api/v1/colors" do
     setup do
       insert_list(2, :color)
