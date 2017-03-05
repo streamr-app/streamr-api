@@ -21,7 +21,9 @@ defmodule Streamr.Router do
     post "/users/auth", UserController, :auth
     get "/users/email_available", UserController, :email_available
     get "/users/me", UserController, :me
-    resources "/users", UserController, only: [:create, :show]
+    resources "/users", UserController, only: [:create, :show] do
+      resources "/streams", StreamController, only: [:index]
+    end
 
     resources "/streams", StreamController, only: [:index, :create, :show] do
       post "/add_line", StreamController, :add_line

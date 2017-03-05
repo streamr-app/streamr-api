@@ -5,12 +5,21 @@ defmodule Streamr.StreamController do
   plug Streamr.Authenticate when action in [:create, :add_line]
 
   def index(conn, params) do
-    streams = Stream
-    |> Stream.with_users
-    |> Stream.ordered
-    |> Repo.paginate(params)
+    streams = params["user_id"]
+              |> filtered_streams
+              |> Stream.with_users
+              |> Stream.ordered
+              |> Repo.paginate(params)
 
     render(conn, "index.json-api", data: streams)
+  end
+
+  defp filtered_streams(user_id) do
+    if user_id do
+      Stream.for_user(user_id)
+    else
+      Stream
+    end
   end
 
   def create(conn, %{"stream" => stream_params}) do

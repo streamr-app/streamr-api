@@ -29,4 +29,9 @@ defmodule Streamr.Stream do
     from stream in query,
     order_by: [asc: stream.id]
   end
+
+  def for_user(user_id) do
+    from stream in Streamr.Stream,
+      where: stream.user_id == ^user_id
+  end
 end

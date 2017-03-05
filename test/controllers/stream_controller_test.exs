@@ -24,6 +24,28 @@ defmodule Streamr.StreamControllerTest do
     end
   end
 
+  describe "GET /users/:id/streams" do
+    test "get a user's streams" do
+      user = insert(:user)
+      insert_list(2, :stream, user: user)
+      insert_list(3, :stream)
+
+      conn = get(
+        build_conn(),
+        "/api/v1/users/#{user.id}/streams"
+      )
+
+      response = json_response(conn, 200)["data"]
+
+      # Finds if all user ids are the same through the collection
+      assert response
+             |> Enum.map(&(&1["relationships"]["user"]["data"]["id"]))
+             |> Enum.all?(&(user.id == String.to_integer(&1)))
+
+      assert 2 == Enum.count(response)
+    end
+  end
+
   describe "GET /api/v1/streams/:slug" do
     test "it returns stream with id 2" do
       stream  = insert(:stream)
