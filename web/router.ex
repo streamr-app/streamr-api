@@ -27,6 +27,7 @@ defmodule Streamr.Router do
 
     resources "/streams", StreamController, only: [:index, :create, :show] do
       post "/add_line", StreamController, :add_line
+      post "/end", StreamController, :end_stream
     end
 
     resources "/topics", TopicController, only: [:index]

@@ -3,6 +3,6 @@ defmodule Streamr.StreamView do
   use JaSerializer.PhoenixView
   use Streamr.Sluggifier, attribute: :title
 
-  attributes [:title, :description, :image]
+  attributes [:title, :description, :image, :s3_path]
   has_one :user, serializer: Streamr.UserView, include: true
 end

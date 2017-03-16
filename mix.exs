@@ -33,7 +33,10 @@ defmodule Streamr.Mixfile do
          :phoenix_swoosh,
          :swoosh,
          :scrivener_ecto,
-         :scrivener
+         :scrivener,
+         :ex_aws,
+         :hackney,
+         :sweet_xml,
        ]
     ]
   end
@@ -65,7 +68,10 @@ defmodule Streamr.Mixfile do
       {:phoenix_swoosh,  "~> 0.1.3"},
       {:scrivener_ecto, "~> 1.0"},
       {:scrivener, "~> 2.0"},
-      {:slugger, "~> 0.1.0"}
+      {:slugger, "~> 0.1.0"},
+      {:ex_aws, "~> 1.0"},
+      {:hackney, "~> 1.6.1"},
+      {:sweet_xml, "~> 0.6"}
     ]
   end
 

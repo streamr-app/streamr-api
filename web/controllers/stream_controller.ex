@@ -1,6 +1,6 @@
 defmodule Streamr.StreamController do
   use Streamr.Web, :controller
-  alias Streamr.{Stream, Repo, StreamData}
+  alias Streamr.{Stream, Repo, StreamData, StreamUploader}
 
   plug Streamr.Authenticate when action in [:create, :add_line]
 
@@ -12,14 +12,6 @@ defmodule Streamr.StreamController do
               |> Repo.paginate(params)
 
     render(conn, "index.json-api", data: streams)
-  end
-
-  defp filtered_streams(user_id) do
-    if user_id do
-      Stream.for_user(user_id)
-    else
-      Stream
-    end
   end
 
   def create(conn, %{"stream" => stream_params}) do
@@ -35,6 +27,7 @@ defmodule Streamr.StreamController do
         conn
         |> put_status(201)
         |> render("show.json-api", data: Repo.preload(stream, :user))
+
       {:error, changeset} ->
         conn
         |> put_status(422)
@@ -52,7 +45,6 @@ defmodule Streamr.StreamController do
 
   def add_line(conn, params) do
     stream = get_stream(params)
-
     case StreamData.append_to(stream, params["line"]) do
       {:ok, _} ->
         send_resp(conn, 201, "")
@@ -61,7 +53,38 @@ defmodule Streamr.StreamController do
     end
   end
 
+  def end_stream(conn, params) do
+    stream = get_stream(params)
+
+    case upload_stream_contents(stream) do
+      {:ok, _} ->
+        conn
+        |> put_status(201)
+        |> render("show.json-api", data: Repo.preload(stream, :user))
+      {:error, error} ->
+        conn
+        |> put_status(422)
+        |> render("errors.json-api", data: error)
+    end
+  end
+
+  defp upload_stream_contents(stream) do
+    s3_path = stream
+              |> Repo.preload(:stream_data)
+              |> StreamUploader.process
+
+    Stream.store_s3_path(stream, s3_path)
+  end
+
   defp get_stream(params) do
     Repo.get(Stream, Map.get(params, "stream_id"))
+  end
+
+  defp filtered_streams(user_id) do
+    if user_id do
+      Stream.for_user(user_id)
+    else
+      Stream
+    end
   end
 end
