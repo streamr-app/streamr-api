@@ -77,7 +77,7 @@ defmodule Streamr.StreamController do
   end
 
   defp get_stream(params) do
-    Repo.get(Stream, Map.get(params, "stream_id"))
+    Repo.get!(Stream, Map.get(params, "stream_id"))
   end
 
   defp filtered_streams(user_id) do

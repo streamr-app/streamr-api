@@ -5,6 +5,14 @@ defmodule Streamr.ErrorView do
     "Page not found"
   end
 
+  def render("404.json", assigns) do
+    error_detail = assigns |> Map.get(:reason) |> Map.get(:message)
+
+    %{errors: [%{
+        title: "record not found",
+        detail: error_detail}]}
+  end
+
   def render("500.html", _assigns) do
     "Internal server error"
   end
