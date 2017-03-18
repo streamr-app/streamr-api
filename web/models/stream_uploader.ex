@@ -12,10 +12,10 @@ defmodule Streamr.StreamUploader do
     file_name = file_name_for(stream)
     create_file(file_name)
 
-    Postgrex.transaction(pg_link_pid, fn(conn) ->
+    Postgrex.transaction(pg_link_pid(), fn(conn) ->
       conn
       |> Postgrex.stream(io_query(conn, stream), [])
-      |> Enum.into(File.stream!(file_name), pg_result_to_io)
+      |> Enum.into(File.stream!(file_name), pg_result_to_io())
     end)
 
     file_name
@@ -36,7 +36,7 @@ defmodule Streamr.StreamUploader do
   end
 
   defp pg_link_pid do
-    repo_config
+    repo_config()
     |> Postgrex.start_link
     |> elem(1)
   end

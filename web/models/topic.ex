@@ -4,7 +4,7 @@ defmodule Streamr.Topic do
   schema "topics" do
     field :name, :string
 
-    timestamps
+    timestamps()
   end
 
   def ordered(query) do

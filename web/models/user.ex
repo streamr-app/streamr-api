@@ -8,7 +8,7 @@ defmodule Streamr.User do
     field :password_hash, :string
     has_many :streams, Streamr.Stream
 
-    timestamps
+    timestamps()
   end
 
   def changeset(model, params \\ :empty) do

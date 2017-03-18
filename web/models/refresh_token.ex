@@ -8,7 +8,7 @@ defmodule Streamr.RefreshToken do
     field :token, :string, null: false
     belongs_to :user, Streamr.User
 
-    timestamps
+    timestamps()
   end
 
   def create_for_user(user) do

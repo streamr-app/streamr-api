@@ -12,7 +12,7 @@ defmodule Streamr.Stream do
     belongs_to :user, Streamr.User
     has_one :stream_data, Streamr.StreamData
 
-    timestamps
+    timestamps()
   end
 
   def changeset(model, params \\ :empty) do

@@ -9,7 +9,7 @@ defmodule Streamr.StreamData do
     field :lines, {:array, :map}
     belongs_to :stream, Streamr.Stream
 
-    timestamps
+    timestamps()
   end
 
   def for_stream(stream) do

@@ -8,7 +8,7 @@ defmodule Streamr.Color do
     field :tritanopia, :string
     field :order, :integer
 
-    timestamps
+    timestamps()
   end
 
   def ordered(query) do

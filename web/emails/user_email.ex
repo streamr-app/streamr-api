@@ -4,7 +4,7 @@ defmodule Streamr.Email do
   # use view: Streamr.EmailView
 
   def welcome(user) do
-    new
+    new()
     |> to({user.name, user.email})
     |> from({"Team Streamr", "team@streamr.live"})
     |> subject("Welcome to Streamr")
