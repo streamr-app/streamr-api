@@ -12,8 +12,7 @@ defmodule Streamr do
       supervisor(Streamr.Repo, []),
       # Start the endpoint when the application starts
       supervisor(Streamr.Endpoint, []),
-      # Start your own worker by calling: Streamr.Worker.start_link(arg1, arg2, arg3)
-      # worker(Streamr.Worker, [arg1, arg2, arg3]),
+      supervisor(Task.Supervisor, [[name: Streamr.UploadSupervisor, restart: :transient]])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

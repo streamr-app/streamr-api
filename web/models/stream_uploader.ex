@@ -46,6 +46,7 @@ defmodule Streamr.StreamUploader do
   end
 
   defp create_file(name) do
+    File.mkdir("exports")
     File.touch(name)
   end
 
