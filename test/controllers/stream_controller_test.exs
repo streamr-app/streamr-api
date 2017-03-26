@@ -101,4 +101,34 @@ defmodule Streamr.StreamControllerTest do
       assert data.lines == [line_data]
     end
   end
+
+  describe "PUT /api/v1/streams/:id" do
+    test "updates a stream" do
+      user = insert(:user)
+      stream = insert(:stream, user: user)
+
+      updated_stream = params_for(:stream, %{title: "updated", description: "updated"})
+
+      conn = put_authorized(user, "/api/v1/streams/#{stream.id}", %{stream: updated_stream})
+      body = json_response(conn, 200)
+
+      assert body["data"]["id"]
+      assert body["data"]["attributes"]["title"] == updated_stream.title
+      assert body["data"]["attributes"]["description"] == updated_stream.description
+      assert body["data"]["relationships"]["user"]["data"]["id"] == Integer.to_string(user.id)
+    end
+  end
+
+  describe "DELETE /api/v1/streams/:id" do
+    test "it deletes the stream" do
+      user = insert(:user)
+      stream = insert(:stream, user: user)
+
+      conn = delete_authorized(user, "/api/v1/streams/#{stream.id}")
+
+      assert conn.status == 204
+      refute Repo.get(Stream, stream.id)
+      refute Repo.get_by(StreamData, stream_id: stream.id)
+    end
+  end
 end

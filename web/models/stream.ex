@@ -10,7 +10,7 @@ defmodule Streamr.Stream do
     field :s3_path, :string
 
     belongs_to :user, Streamr.User
-    has_one :stream_data, Streamr.StreamData
+    has_one :stream_data, Streamr.StreamData, on_delete: :delete_all
 
     timestamps()
   end

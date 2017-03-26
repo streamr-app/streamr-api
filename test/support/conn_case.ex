@@ -36,6 +36,18 @@ defmodule Streamr.ConnCase do
         |> post(endpoint, body)
       end
 
+      def put_authorized(user, endpoint, body \\ %{}) do
+        build_conn()
+        |> Guardian.Plug.api_sign_in(user)
+        |> put(endpoint, body)
+      end
+
+      def delete_authorized(user, endpoint, body \\ %{}) do
+        build_conn()
+        |> Guardian.Plug.api_sign_in(user)
+        |> delete(endpoint, body)
+      end
+
       def get_authorized(user, endpoint, body \\ %{}) do
         build_conn()
         |> Guardian.Plug.api_sign_in(user)
