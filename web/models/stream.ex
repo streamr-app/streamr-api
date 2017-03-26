@@ -1,5 +1,6 @@
 defmodule Streamr.Stream do
   use Streamr.Web, :model
+  use Timex.Ecto.Timestamps
   alias Streamr.Repo
   import Ecto.Query
 
@@ -8,6 +9,7 @@ defmodule Streamr.Stream do
     field :description, :string
     field :image, :string
     field :s3_path, :string
+    field :duration, :integer
 
     belongs_to :user, Streamr.User
     has_one :stream_data, Streamr.StreamData, on_delete: :delete_all
@@ -19,6 +21,13 @@ defmodule Streamr.Stream do
     model
     |> cast(params, [:title, :description])
     |> validate_required([:title])
+  end
+
+  def duration_changeset(model) do
+    duration = Timex.to_unix(Timex.now()) - Timex.to_unix(model.inserted_at)
+
+    model
+    |> cast(%{duration: duration}, [:duration])
   end
 
   def with_users(query) do

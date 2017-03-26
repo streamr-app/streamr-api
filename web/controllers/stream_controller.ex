@@ -86,11 +86,20 @@ defmodule Streamr.StreamController do
 
   def end_stream(conn, params) do
     stream = get_stream(params)
-    upload_in_background(stream)
+    changeset = Stream.duration_changeset(stream)
 
-    conn
-    |> put_status(201)
-    |> render("show.json-api", data: Repo.preload(stream, :user))
+    case Repo.update(changeset) do
+      {:ok, stream} ->
+        upload_in_background(stream)
+
+        conn
+        |> put_status(201)
+        |> render("show.json-api", data: Repo.preload(stream, :user))
+      {:error, changeset} ->
+        conn
+        |> put_status(422)
+        |> render("errors.json-api", data: changeset)
+    end
   end
 
   defp upload_in_background(stream) do

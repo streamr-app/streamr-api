@@ -37,6 +37,8 @@ defmodule Streamr.Mixfile do
          :ex_aws,
          :hackney,
          :sweet_xml,
+         :timex,
+         :timex_ecto
        ]
     ]
   end
@@ -71,7 +73,9 @@ defmodule Streamr.Mixfile do
       {:slugger, "~> 0.1.0"},
       {:ex_aws, "~> 1.0"},
       {:hackney, "~> 1.6.1"},
-      {:sweet_xml, "~> 0.6"}
+      {:sweet_xml, "~> 0.6"},
+      {:timex, "~> 3.0"},
+      {:timex_ecto, "~> 3.0"}
     ]
   end
 
