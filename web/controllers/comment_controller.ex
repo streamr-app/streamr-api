@@ -35,6 +35,7 @@ defmodule Streamr.CommentController do
 
   def delete(conn, %{"id" => id}) do
     comment = Repo.get!(Comment, id)
+    conn = authorize!(conn, comment)
 
     case Repo.delete(comment) do
     {:ok, _} ->

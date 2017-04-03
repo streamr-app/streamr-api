@@ -36,6 +36,8 @@ defmodule Streamr.Web do
 
       import Streamr.Router.Helpers
       import Streamr.Gettext
+
+      import Bodyguard.Controller
     end
   end
 
@@ -52,6 +54,8 @@ defmodule Streamr.Web do
       import Streamr.Router.Helpers
       import Streamr.ErrorHelpers
       import Streamr.Gettext
+
+      import Bodyguard.ViewHelpers
     end
   end
 

@@ -45,6 +45,7 @@ defmodule Streamr.StreamController do
 
   def delete(conn, %{"id" => id}) do
     stream = Repo.get!(Stream, id)
+    conn = authorize!(conn, stream)
 
     case Repo.delete(stream) do
     {:ok, _} ->
@@ -60,6 +61,7 @@ defmodule Streamr.StreamController do
   def update(conn, %{"id" => id, "stream" => stream_params}) do
     stream = Repo.get!(Stream, id)
     changeset = Stream.changeset(stream, stream_params)
+    conn = authorize!(conn, stream)
 
     case Repo.update(changeset) do
       {:ok, stream} ->
@@ -76,6 +78,8 @@ defmodule Streamr.StreamController do
 
   def add_line(conn, params) do
     stream = get_stream(params)
+    conn = authorize!(conn, stream)
+
     case StreamData.append_to(stream, params["line"]) do
       {:ok, _} ->
         send_resp(conn, 201, "")
@@ -86,6 +90,7 @@ defmodule Streamr.StreamController do
 
   def end_stream(conn, params) do
     stream = get_stream(params)
+    conn = authorize!(conn, stream)
     changeset = Stream.duration_changeset(stream)
 
     case Repo.update(changeset) do

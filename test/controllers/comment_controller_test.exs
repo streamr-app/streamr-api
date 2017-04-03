@@ -60,6 +60,18 @@ defmodule Streamr.CommentControllerTest do
       refute Repo.get(Comment, comment.id)
     end
 
+    test "it prevents deleting unless the comment belongs to the user" do
+      try do
+        comment = insert(:comment)
+        other_user = insert(:user)
+
+        delete_authorized(other_user, "/api/v1/comments/#{comment.id}")
+      rescue
+        exception in Bodyguard.NotAuthorizedError ->
+          assert Plug.Exception.status(exception) == 403
+      end
+    end
+
     test "it prevents deleting unless the user is signed in" do
       comment = insert(:comment)
 

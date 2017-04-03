@@ -1,6 +1,12 @@
 defmodule Streamr.ErrorView do
   use Streamr.Web, :view
 
+  def render("403.json", _assigns) do
+    %{errors: [%{
+        title: "unauthorized",
+        detail: "you are not authorized to perform that action"}]}
+  end
+
   def render("404.html", _assigns) do
     "Page not found"
   end

@@ -88,47 +88,86 @@ defmodule Streamr.StreamControllerTest do
     end
   end
 
-  describe "POST /api/v1/streams/:id" do
-    test "it adds a new line to the stream's stream_data" do
-      user = insert(:user)
+  describe "POST /api/v1/streams/:id/add_line" do
+    setup do
       stream = :stream |> insert |> with_stream_data
       line_data = build(:line_data)
 
-      conn = post_authorized(user, "/api/v1/streams/#{stream.id}/add_line", %{line: line_data})
+      {:ok, stream: stream, line_data: line_data}
+    end
+
+    test "it adds a new line to the stream's stream_data",
+    %{stream: stream, line_data: line_data} do
+      conn = post_authorized(
+        stream.user,
+        "/api/v1/streams/#{stream.id}/add_line",
+        %{line: line_data}
+      )
+
       assert response(conn, 201)
 
-      data = StreamData.for_stream(stream)
-      assert data.lines == [line_data]
+      assert StreamData.for_stream(stream).lines == [line_data]
+    end
+
+    test "it prevents adding lines to another user's stream",
+    %{stream: stream, line_data: line_data} do
+      try do
+        post_authorized(insert(:user), "/api/v1/streams/#{stream.id}/add_line", %{line: line_data})
+      rescue
+        exception in Bodyguard.NotAuthorizedError ->
+          assert Plug.Exception.status(exception) == 403
+      end
     end
   end
 
   describe "PUT /api/v1/streams/:id" do
-    test "updates a stream" do
-      user = insert(:user)
-      stream = insert(:stream, user: user)
+    setup do
+      stream = insert(:stream)
+      stream_params = params_for(:stream, %{title: "updated", description: "updated"})
 
-      updated_stream = params_for(:stream, %{title: "updated", description: "updated"})
+      {:ok, stream: stream, stream_params: stream_params}
+    end
 
-      conn = put_authorized(user, "/api/v1/streams/#{stream.id}", %{stream: updated_stream})
+    test "updates a stream", %{stream: stream, stream_params: stream_params} do
+      conn = put_authorized(stream.user, "/api/v1/streams/#{stream.id}", %{stream: stream_params})
       body = json_response(conn, 200)
 
       assert body["data"]["id"]
-      assert body["data"]["attributes"]["title"] == updated_stream.title
-      assert body["data"]["attributes"]["description"] == updated_stream.description
-      assert body["data"]["relationships"]["user"]["data"]["id"] == Integer.to_string(user.id)
+      assert body["data"]["attributes"]["title"] == stream_params.title
+      assert body["data"]["attributes"]["description"] == stream_params.description
+    end
+
+    test "it prevents updating another user's stream",
+    %{stream: stream, stream_params: stream_params} do
+      try do
+        put_authorized(insert(:user), "/api/v1/streams/#{stream.id}", %{stream: stream_params})
+      rescue
+        exception in Bodyguard.NotAuthorizedError ->
+          assert Plug.Exception.status(exception) == 403
+      end
     end
   end
 
   describe "DELETE /api/v1/streams/:id" do
-    test "it deletes the stream" do
-      user = insert(:user)
-      stream = insert(:stream, user: user)
+    setup do
+      {:ok, stream: insert(:stream)}
+    end
 
-      conn = delete_authorized(user, "/api/v1/streams/#{stream.id}")
+    test "it deletes the stream", %{stream: stream} do
+      conn = delete_authorized(stream.user, "/api/v1/streams/#{stream.id}")
 
       assert conn.status == 204
       refute Repo.get(Stream, stream.id)
       refute Repo.get_by(StreamData, stream_id: stream.id)
+    end
+
+    test "it prevents updating another user's stream", %{stream: stream} do
+      try do
+        delete_authorized(insert(:user), "/api/v1/streams/#{stream.id}")
+      rescue
+        exception in Bodyguard.NotAuthorizedError ->
+          assert Plug.Exception.status(exception) == 403
+      end
     end
   end
 end

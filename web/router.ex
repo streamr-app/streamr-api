@@ -13,6 +13,7 @@ defmodule Streamr.Router do
     plug :accepts, ["json"]
     plug Guardian.Plug.VerifyHeader, realm: "Bearer"
     plug Guardian.Plug.LoadResource
+    plug Streamr.CurrentUser
   end
 
   scope "/api/v1", Streamr do

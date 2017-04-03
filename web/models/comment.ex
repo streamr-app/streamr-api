@@ -1,7 +1,6 @@
 defmodule Streamr.Comment do
   use Streamr.Web, :model
   use Timex.Ecto.Timestamps
-  alias Streamr.Repo
   import Ecto.Query
 
   schema "comments" do
