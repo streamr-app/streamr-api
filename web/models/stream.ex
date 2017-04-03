@@ -13,6 +13,7 @@ defmodule Streamr.Stream do
 
     belongs_to :user, Streamr.User
     has_one :stream_data, Streamr.StreamData, on_delete: :delete_all
+    has_many :comment, Streamr.Comment, on_delete: :delete_all
 
     timestamps()
   end

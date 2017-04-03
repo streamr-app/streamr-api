@@ -43,6 +43,14 @@ defmodule Streamr.Factory do
     }
   end
 
+  def comment_factory do
+    %Streamr.Comment{
+      body: sequence(:body, &"comment-#{&1}"),
+      stream: build(:stream),
+      user: build(:user)
+    }
+  end
+
   def line_data_factory do
     %{
       "points" => [%{

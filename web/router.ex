@@ -26,9 +26,12 @@ defmodule Streamr.Router do
     end
 
     resources "/streams", StreamController do
+      resources "/comments", CommentController, only: [:index, :create]
       post "/add_line", StreamController, :add_line
       post "/end", StreamController, :end_stream
     end
+
+    resources "/comments", CommentController, only: [:delete]
 
     resources "/topics", TopicController, only: [:index]
 

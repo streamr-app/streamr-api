@@ -7,6 +7,7 @@ defmodule Streamr.User do
     field :password, :string, virtual: true
     field :password_hash, :string
     has_many :streams, Streamr.Stream
+    has_many :comment, Streamr.Comment, on_delete: :delete_all
 
     timestamps()
   end
