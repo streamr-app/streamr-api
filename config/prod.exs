@@ -17,8 +17,12 @@ config :streamr, Streamr.Endpoint,
   cache_static_manifest: "priv/static/manifest.json"
 
 config :streamr, Streamr.Repo,
+  username: System.get_env("DATABASE_USER"),
+  database: System.get_env("DATABASE_NAME"),
+  hostname: System.get_env("DATABASE_HOST"),
+  port: System.get_env("DATABASE_PORT"),
+  password: System.get_env("DATABASE_PASSWORD"),
   adapter: Ecto.Adapters.Postgres,
-  url: System.get_env("DATABASE_URL"),
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
   ssl: true
 
