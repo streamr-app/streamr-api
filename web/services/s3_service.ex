@@ -15,12 +15,14 @@ defmodule Streamr.S3Service do
   end
 
   defp resource_path_for(model, filepath) do
-    "#{table_name(model)}/#{model.id}/#{hashed_path(filepath)}"
+    "#{table_name(model)}/#{model.id}/#{hashed_contents(filepath)}"
   end
 
-  defp hashed_path(filepath) do
-    :sha256
-    |> :crypto.hash(filepath)
+  defp hashed_contents(filepath) do
+    filepath
+    |> File.stream!()
+    |> Enum.reduce(:crypto.hash_init(:sha256), fn(line, acc) -> :crypto.hash_update(acc,line) end)
+    |> :crypto.hash_final
     |> Base.encode16
   end
 
