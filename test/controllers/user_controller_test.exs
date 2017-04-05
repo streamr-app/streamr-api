@@ -264,8 +264,16 @@ defmodule Streamr.UserControllerTest do
 
       conn = post_authorized(me, "/api/v1/users/#{other.id}/subscribe")
 
-      assert conn.status == 200
+      assert conn.status == 204
       assert [other] == Repo.preload(me, :subscriptions).subscriptions
+    end
+
+    test "it returns a 204 when the user is already subscribed" do
+      [me, other] = insert_list(2, :user)
+
+      conn = post_authorized(me, "/api/v1/users/#{other.id}/subscribe")
+
+      assert conn.status == 204
     end
 
     test "it prevents subscribing unless the user is logged in" do
@@ -285,6 +293,14 @@ defmodule Streamr.UserControllerTest do
 
       assert conn.status == 204
       assert [] == Repo.preload(me, :subscriptions).subscriptions
+    end
+
+    test "it returns a 204 when the user is not subscribed" do
+      [me, other] = insert_list(2, :user)
+
+      conn = post_authorized(me, "/api/v1/users/#{other.id}/unsubscribe")
+
+      assert conn.status == 204
     end
 
     test "it prevents unsubscribing unless the user is logged in" do

@@ -5,6 +5,9 @@ defmodule Streamr.UserController do
   plug Streamr.Authenticate
     when action in [:me, :my_subscribers, :my_subscriptions, :subscribe, :unsubscribe]
 
+  plug :halt_if_subscribed when action in [:subscribe]
+  plug :halt_if_unsubscribed when action in [:unsubscribe]
+
   def create(conn, %{"user" => user_params}) do
     changeset = User.registration_changeset(%User{}, user_params)
 
@@ -84,7 +87,7 @@ defmodule Streamr.UserController do
     )
 
     case Repo.insert(changeset) do
-      {:ok, _} -> send_resp(conn, 200, "")
+      {:ok, _} -> send_resp(conn, 204, "")
       {:error, error} -> render(conn, "errors.json-api", data: error)
     end
   end
@@ -100,6 +103,30 @@ defmodule Streamr.UserController do
       {:ok, _} -> send_resp(conn, 204, "")
       {:error, error} -> conn |> put_status(400) |> render("errors.json-api", data: error)
     end
+  end
+
+  defp halt_if_subscribed(conn, _) do
+    if get_subscription(conn) do
+      conn |> send_resp(204, "") |> halt
+    else
+      conn
+    end
+  end
+
+  defp halt_if_unsubscribed(conn, _) do
+    if get_subscription(conn) do
+      conn
+    else
+      conn |> send_resp(204, "") |> halt
+    end
+  end
+
+  def get_subscription(conn) do
+    Repo.get_by(
+      UserSubscription,
+      subscription_id: conn.params["user_id"],
+      subscriber_id: conn.assigns[:current_user].id
+    )
   end
 
   defp generate_access_token(conn, user) do
