@@ -6,7 +6,7 @@ defmodule Streamr.UserControllerTest do
 
   describe "POST /users" do
     test "with valid user data", %{conn: conn} do
-      valid_user = params_for(:user)
+      valid_user = :user |> params_for() |> with_password()
 
       conn = post conn, "api/v1/users", %{"user" => valid_user}
       body = json_response(conn, 201)
@@ -19,14 +19,14 @@ defmodule Streamr.UserControllerTest do
     end
 
     test "with valid user data, sends email for verification", %{conn: conn} do
-      valid_user = params_for(:user)
+      valid_user = :user |> params_for() |> with_password()
 
       post conn, "api/v1/users", %{"user" => valid_user}
       assert_email_sent Streamr.Email.welcome(valid_user)
     end
 
     test "with invalid data", %{conn: conn} do
-      invalid_user = params_for(:user, email: nil)
+      invalid_user = :user |> params_for(email: nil) |> with_password()
 
       conn = post conn, "api/v1/users", %{"user" => invalid_user}
       body = json_response(conn, 422)["errors"]
@@ -37,7 +37,7 @@ defmodule Streamr.UserControllerTest do
     end
 
     test "when a user exists with the email", %{conn: conn} do
-      valid_user = params_for(:user)
+      valid_user = :user |> params_for() |> with_password()
 
       conn = post conn, "api/v1/users", %{"user" => valid_user}
       json_response(conn, 201)
@@ -66,12 +66,32 @@ defmodule Streamr.UserControllerTest do
 
       assert String.to_integer(response["id"]) == user.id
     end
+
+    test "current_user_subscribed is true if the user is subscribed" do
+      [me, other] = insert_list(2, :user)
+      insert(:user_subscription, subscriber: me, subscription: other)
+
+      conn = get_authorized(me, "/api/v1/users/#{other.id}")
+      response = json_response(conn, 200)["data"]
+
+      assert response["attributes"]["current-user-subscribed"]
+    end
+
+    test "current_user_subscribed is false if the user is unsubscribed" do
+      [me, other] = insert_list(2, :user)
+
+      conn = get_authorized(me, "/api/v1/users/#{other.id}")
+      response = json_response(conn, 200)["data"]
+
+      refute response["attributes"]["current-user-subscribed"]
+    end
   end
 
   describe "POST /users/auth (password grant type)" do
     setup do
       user = :user
-             |> build(password: "password")
+             |> build()
+             |> with_password()
              |> set_password("password")
              |> insert
 
@@ -185,6 +205,91 @@ defmodule Streamr.UserControllerTest do
 
     test "when there is no authentication" do
       conn = build_conn() |> get("/api/v1/users/me")
+
+      json_response(conn, 401)
+    end
+  end
+
+  describe "GET /api/v1/users/my_subscriptions" do
+    test "returns users I subscribe to" do
+      me = insert(:user)
+      subscriptions = insert_list(3, :user_subscription, subscriber: me)
+      _others = insert_list(2, :user_subscription, subscriber: insert(:user))
+
+      conn = get_authorized(me, "/api/v1/users/my_subscriptions")
+
+      response = json_response(conn, 200)["data"]
+      assert Enum.count(response) == Enum.count(subscriptions)
+    end
+
+    test "my subscriptions show that I am subscribed" do
+      me = insert(:user)
+      insert_list(3, :user_subscription, subscriber: me)
+
+      conn = get_authorized(me, "/api/v1/users/my_subscriptions")
+
+      response = json_response(conn, 200)["data"]
+      assert Enum.all?(response, &(&1["attributes"]["current-user-subscribed"]))
+    end
+
+    test "fails without an auth token" do
+      conn = get(build_conn(), "/api/v1/users/my_subscriptions")
+
+      json_response(conn, 401)
+    end
+  end
+
+  describe "GET /api/v1/users/my_subscribers" do
+    test "returns all users subscribed to me" do
+      me = insert(:user)
+      subscribers = insert_list(3, :user_subscription, subscription: me)
+      _others = insert_list(2, :user_subscription, subscription: insert(:user))
+
+      conn = get_authorized(me, "/api/v1/users/my_subscribers")
+
+      response = json_response(conn, 200)["data"]
+      assert Enum.count(response) == Enum.count(subscribers)
+    end
+
+    test "fails without an auth token" do
+      conn = get(build_conn(), "/api/v1/users/my_subscribers")
+
+      json_response(conn, 401)
+    end
+  end
+
+  describe "POST /api/v1/users/:id/subscribe" do
+    test "it subscribes the current user to the specified user" do
+      [me, other] = insert_list(2, :user)
+
+      conn = post_authorized(me, "/api/v1/users/#{other.id}/subscribe")
+
+      assert conn.status == 200
+      assert [other] == Repo.preload(me, :subscriptions).subscriptions
+    end
+
+    test "it prevents subscribing unless the user is logged in" do
+      user = insert(:user)
+      conn = post(build_conn(), "/api/v1/users/#{user.id}/subscribe")
+
+      json_response(conn, 401)
+    end
+  end
+
+  describe "POST /api/v1/users/:id/unsubscribe" do
+    test "it unsubscribes the current user to the specified user" do
+      [me, other] = insert_list(2, :user)
+      insert(:user_subscription, subscriber: me, subscription: other)
+
+      conn = post_authorized(me, "/api/v1/users/#{other.id}/unsubscribe")
+
+      assert conn.status == 204
+      assert [] == Repo.preload(me, :subscriptions).subscriptions
+    end
+
+    test "it prevents unsubscribing unless the user is logged in" do
+      user = insert(:user)
+      conn = post(build_conn(), "/api/v1/users/#{user.id}/unsubscribe")
 
       json_response(conn, 401)
     end

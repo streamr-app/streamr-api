@@ -1,7 +1,9 @@
 defmodule Streamr.UserController do
   use Streamr.Web, :controller
-  plug Streamr.Authenticate when action in [:me]
-  alias Streamr.{User, RefreshToken, Repo, Mailer, Email}
+  alias Streamr.{User, RefreshToken, Repo, Mailer, Email, UserSubscription}
+
+  plug Streamr.Authenticate
+    when action in [:me, :my_subscribers, :my_subscriptions, :subscribe, :unsubscribe]
 
   def create(conn, %{"user" => user_params}) do
     changeset = User.registration_changeset(%User{}, user_params)
@@ -61,6 +63,43 @@ defmodule Streamr.UserController do
 
   def me(conn, _assigns) do
     render(conn, "show.json-api", data: Guardian.Plug.current_resource(conn))
+  end
+
+  def my_subscriptions(conn, _assigns) do
+    user = conn.assigns[:current_user] |> Repo.preload(:subscriptions)
+
+    render(conn, "index.json-api", data: user.subscriptions)
+  end
+
+  def my_subscribers(conn, _assigns) do
+    user = conn.assigns[:current_user] |> Repo.preload(:subscribers)
+
+    render(conn, "index.json-api", data: user.subscribers)
+  end
+
+  def subscribe(conn, %{"user_id" => subscription_id}) do
+    changeset = UserSubscription.new_subscription_changeset(
+      %UserSubscription{},
+      %{subscription_id: subscription_id, subscriber_id: conn.assigns[:current_user].id}
+    )
+
+    case Repo.insert(changeset) do
+      {:ok, _} -> send_resp(conn, 200, "")
+      {:error, error} -> render(conn, "errors.json-api", data: error)
+    end
+  end
+
+  def unsubscribe(conn, %{"user_id" => subscription_id}) do
+    subscription = Repo.get_by!(
+      UserSubscription,
+      subscription_id: subscription_id,
+      subscriber_id: conn.assigns[:current_user].id
+    )
+
+    case Repo.delete(subscription) do
+      {:ok, _} -> send_resp(conn, 204, "")
+      {:error, error} -> conn |> put_status(400) |> render("errors.json-api", data: error)
+    end
   end
 
   defp generate_access_token(conn, user) do

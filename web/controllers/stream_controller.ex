@@ -51,10 +51,10 @@ defmodule Streamr.StreamController do
     {:ok, _} ->
       send_resp(conn, 204, "")
 
-    {:error, _} ->
+    {:error, error} ->
       conn
       |> put_status(400)
-      |> render("errors.json-api")
+      |> render("errors.json-api", data: error)
     end
   end
 

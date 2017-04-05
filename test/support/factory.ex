@@ -6,8 +6,11 @@ defmodule Streamr.Factory do
     %Streamr.User{
       name: sequence(:username, &"User-#{&1}"),
       email: sequence(:email, &"example#{&1}@example.com"),
-      password: "password"
     }
+  end
+
+  def with_password(user) do
+    %{user | password: "password"}
   end
 
   def refresh_token_factory do
@@ -68,6 +71,13 @@ defmodule Streamr.Factory do
       deuteranopia: "Foodelooap",
       protanopia: "foobie doo",
       tritanopia: "foobarb pie"
+    }
+  end
+
+  def user_subscription_factory do
+    %Streamr.UserSubscription{
+      subscriber: build(:user),
+      subscription: build(:user)
     }
   end
 

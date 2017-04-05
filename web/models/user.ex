@@ -1,13 +1,21 @@
 defmodule Streamr.User do
   use Streamr.Web, :model
+  alias Streamr.{User, UserSubscription}
 
   schema "users" do
     field :name, :string
     field :email, :string
     field :password, :string, virtual: true
     field :password_hash, :string
+
     has_many :streams, Streamr.Stream
     has_many :comment, Streamr.Comment, on_delete: :delete_all
+
+    has_many :_subscribers, Streamr.UserSubscription, foreign_key: :subscription_id
+    has_many :subscribers, through: [:_subscribers, :subscriber]
+
+    has_many :_subscriptions, Streamr.UserSubscription, foreign_key: :subscriber_id
+    has_many :subscriptions, through: [:_subscriptions, :subscription]
 
     timestamps()
   end
