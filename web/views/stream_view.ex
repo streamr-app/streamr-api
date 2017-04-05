@@ -6,7 +6,7 @@ defmodule Streamr.StreamView do
 
   @cdn_url System.get_env("CLOUDFRONT_URL")
 
-  attributes [:title, :description, :image, :data_url, :duration]
+  attributes [:title, :description, :image, :data_url, :duration, :published_at]
   has_one :user, serializer: Streamr.UserView, include: true
 
   def data_url(%Stream{s3_key: nil}, _conn), do: nil

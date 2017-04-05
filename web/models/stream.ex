@@ -10,6 +10,7 @@ defmodule Streamr.Stream do
     field :image, :string
     field :s3_key, :string
     field :duration, :integer
+    field :published_at, Timex.Ecto.DateTime
 
     belongs_to :user, Streamr.User
     has_one :stream_data, Streamr.StreamData, on_delete: :delete_all
@@ -25,10 +26,11 @@ defmodule Streamr.Stream do
   end
 
   def duration_changeset(model) do
-    duration = Timex.to_unix(Timex.now()) - Timex.to_unix(model.inserted_at)
+    published_at = Timex.now()
+    duration = Timex.to_unix(published_at) - Timex.to_unix(model.inserted_at)
 
     model
-    |> cast(%{duration: duration}, [:duration])
+    |> cast(%{duration: duration, published_at: published_at}, [:duration, :published_at])
   end
 
   def with_users(query) do
@@ -39,7 +41,7 @@ defmodule Streamr.Stream do
 
   def ordered(query) do
     from stream in query,
-    order_by: [asc: stream.id]
+    order_by: [desc: stream.published_at]
   end
 
   def for_user(user_id) do
