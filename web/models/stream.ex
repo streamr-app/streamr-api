@@ -1,7 +1,7 @@
 defmodule Streamr.Stream do
   use Streamr.Web, :model
   use Timex.Ecto.Timestamps
-  alias Streamr.Repo
+  alias Streamr.{Repo, UserSubscription}
   import Ecto.Query
 
   schema "streams" do
@@ -44,7 +44,13 @@ defmodule Streamr.Stream do
 
   def for_user(user_id) do
     from stream in Streamr.Stream,
-      where: stream.user_id == ^user_id
+    where: stream.user_id == ^user_id
+  end
+
+  def subscribed(user) do
+    from stream in Streamr.Stream,
+    inner_join: sub in UserSubscription, on: sub.subscriber_id == ^user.id,
+    where: stream.user_id == sub.subscription_id
   end
 
   def store_data_url(stream, data_url) do

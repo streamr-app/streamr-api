@@ -170,4 +170,33 @@ defmodule Streamr.StreamControllerTest do
       end
     end
   end
+
+  describe "GET /api/v1/streams/subscribed" do
+    setup do
+      [me, subscribed_user] = insert_list(2, :user)
+
+      insert(:user_subscription, subscriber: me, subscription: subscribed_user)
+      streams = insert_list(3, :stream, user: subscribed_user)
+      _decoys = insert_list(2, :stream)
+
+      {:ok, me: me, subscribed_users_streams: streams}
+    end
+
+    test "it returns streams from my subscribers", params do
+      conn = get_authorized(params.me, "/api/v1/streams/subscribed")
+
+      response = json_response(conn, 200)["data"]
+
+      subscribed_stream_ids = params.subscribed_users_streams |> Enum.map(&(&1.id))
+      response_ids = response |> Enum.map(&(String.to_integer(&1["id"])))
+
+      assert subscribed_stream_ids == response_ids
+    end
+
+    test "it returns a 401 when the user is not logged in" do
+      conn = get(build_conn(), "/api/v1/streams/subscribed")
+
+      json_response(conn, 401)
+    end
+  end
 end

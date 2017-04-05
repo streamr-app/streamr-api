@@ -31,6 +31,7 @@ defmodule Streamr.Router do
       post "/unsubscribe", UserController, :unsubscribe
     end
 
+    get "/streams/subscribed", StreamController, :subscribed
     resources "/streams", StreamController do
       resources "/comments", CommentController, only: [:index, :create]
       post "/add_line", StreamController, :add_line

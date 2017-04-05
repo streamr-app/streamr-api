@@ -2,13 +2,23 @@ defmodule Streamr.StreamController do
   use Streamr.Web, :controller
   alias Streamr.{Stream, Repo, StreamData, StreamUploader}
 
-  plug Streamr.Authenticate when action in [:create, :add_line]
+  plug Streamr.Authenticate when action in [:create, :add_line, :subscribed]
 
   def index(conn, params) do
     streams = params["user_id"]
               |> filtered_streams
               |> Stream.with_users
               |> Stream.ordered
+              |> Repo.paginate(params)
+
+    render(conn, "index.json-api", data: streams)
+  end
+
+  def subscribed(conn, params) do
+    streams = conn.assigns[:current_user]
+              |> Stream.subscribed()
+              |> Stream.with_users()
+              |> Stream.ordered()
               |> Repo.paginate(params)
 
     render(conn, "index.json-api", data: streams)
