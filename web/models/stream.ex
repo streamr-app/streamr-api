@@ -8,7 +8,7 @@ defmodule Streamr.Stream do
     field :title, :string, null: false
     field :description, :string
     field :image, :string
-    field :data_url, :string
+    field :s3_key, :string
     field :duration, :integer
 
     belongs_to :user, Streamr.User
@@ -53,12 +53,12 @@ defmodule Streamr.Stream do
     where: stream.user_id == sub.subscription_id
   end
 
-  def store_data_url(stream, data_url) do
-    params = %{data_url: data_url}
+  def store_s3_key(stream, s3_key) do
+    params = %{s3_key: s3_key}
 
     stream
-    |> cast(params, [:data_url])
-    |> validate_required([:data_url])
+    |> cast(params, [:s3_key])
+    |> validate_required([:s3_key])
     |> Repo.update
   end
 end

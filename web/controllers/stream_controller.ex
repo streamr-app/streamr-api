@@ -124,11 +124,11 @@ defmodule Streamr.StreamController do
   end
 
   defp upload_stream_contents(stream) do
-    stream_data_url = stream
+    stream_s3_key = stream
               |> Repo.preload(:stream_data)
               |> StreamUploader.process
 
-    Stream.store_data_url(stream, stream_data_url)
+    Stream.store_s3_key(stream, stream_s3_key)
   end
 
   defp get_stream(params) do
