@@ -24,6 +24,52 @@ defmodule Streamr.StreamControllerTest do
     end
   end
 
+  describe "GET /api/v1/topics/:topic_id/streams" do
+    test "it returns streams belonging to the specified topic" do
+      topic = insert(:topic)
+
+      streams_in_topic = insert_list(3, :stream, topic: topic)
+      _decoys = insert_list(2, :stream)
+
+      conn = get(build_conn(), "/api/v1/topics/#{topic.id}/streams")
+      response = json_response(conn, 200)["data"]
+
+      stream_ids_in_topic = streams_in_topic |> Enum.map(&(&1.id)) |> Enum.sort
+      response_ids = response |> Enum.map(&(String.to_integer(&1["id"]))) |> Enum.sort
+
+      assert stream_ids_in_topic == response_ids
+    end
+  end
+
+  describe "GET /api/v1/streams/subscribed" do
+    setup do
+      [me, subscribed_user] = insert_list(2, :user)
+
+      insert(:user_subscription, subscriber: me, subscription: subscribed_user)
+      streams = insert_list(3, :stream, user: subscribed_user)
+      _decoys = insert_list(2, :stream)
+
+      {:ok, me: me, subscribed_users_streams: streams}
+    end
+
+    test "it returns streams from my subscribers", params do
+      conn = get_authorized(params.me, "/api/v1/streams/subscribed")
+
+      response = json_response(conn, 200)["data"]
+
+      subscribed_stream_ids = params.subscribed_users_streams |> Enum.map(&(&1.id)) |> Enum.sort
+      response_ids = response |> Enum.map(&(String.to_integer(&1["id"]))) |> Enum.sort
+
+      assert subscribed_stream_ids == response_ids
+    end
+
+    test "it returns a 401 when the user is not logged in" do
+      conn = get(build_conn(), "/api/v1/streams/subscribed")
+
+      json_response(conn, 401)
+    end
+  end
+
   describe "GET /users/:id/streams" do
     test "get a user's streams" do
       user = insert(:user)
@@ -168,35 +214,6 @@ defmodule Streamr.StreamControllerTest do
         exception in Bodyguard.NotAuthorizedError ->
           assert Plug.Exception.status(exception) == 403
       end
-    end
-  end
-
-  describe "GET /api/v1/streams/subscribed" do
-    setup do
-      [me, subscribed_user] = insert_list(2, :user)
-
-      insert(:user_subscription, subscriber: me, subscription: subscribed_user)
-      streams = insert_list(3, :stream, user: subscribed_user)
-      _decoys = insert_list(2, :stream)
-
-      {:ok, me: me, subscribed_users_streams: streams}
-    end
-
-    test "it returns streams from my subscribers", params do
-      conn = get_authorized(params.me, "/api/v1/streams/subscribed")
-
-      response = json_response(conn, 200)["data"]
-
-      subscribed_stream_ids = params.subscribed_users_streams |> Enum.map(&(&1.id)) |> Enum.sort()
-      response_ids = response |> Enum.map(&(String.to_integer(&1["id"]))) |> Enum.sort()
-
-      assert subscribed_stream_ids == response_ids
-    end
-
-    test "it returns a 401 when the user is not logged in" do
-      conn = get(build_conn(), "/api/v1/streams/subscribed")
-
-      json_response(conn, 401)
     end
   end
 end

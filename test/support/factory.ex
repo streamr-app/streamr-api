@@ -24,7 +24,8 @@ defmodule Streamr.Factory do
     %Streamr.Stream{
       user: build(:user),
       title: sequence(:title, &"title-#{&1}"),
-      description: sequence(:description, &"description-#{&1}")
+      description: sequence(:description, &"description-#{&1}"),
+      topic: build(:topic)
     }
   end
 

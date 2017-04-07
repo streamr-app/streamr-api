@@ -13,6 +13,7 @@ defmodule Streamr.Stream do
     field :published_at, Timex.Ecto.DateTime
 
     belongs_to :user, Streamr.User
+    belongs_to :topic, Streamr.Topic
     has_one :stream_data, Streamr.StreamData, on_delete: :delete_all
     has_many :comment, Streamr.Comment, on_delete: :delete_all
 
@@ -33,9 +34,9 @@ defmodule Streamr.Stream do
     |> cast(%{duration: duration, published_at: published_at}, [:duration, :published_at])
   end
 
-  def with_users(query) do
+  def with_associations(query) do
     from stream in query,
-    preload: [:user],
+    preload: [:user, :topic],
     select: stream
   end
 
@@ -47,6 +48,11 @@ defmodule Streamr.Stream do
   def for_user(user_id) do
     from stream in Streamr.Stream,
     where: stream.user_id == ^user_id
+  end
+
+  def for_topic(topic_id) do
+    from stream in Streamr.Stream,
+    where: stream.topic_id == ^topic_id
   end
 
   def subscribed(user) do

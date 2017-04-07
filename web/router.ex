@@ -40,7 +40,9 @@ defmodule Streamr.Router do
 
     resources "/comments", CommentController, only: [:delete]
 
-    resources "/topics", TopicController, only: [:index]
+    resources "/topics", TopicController, only: [:index] do
+      resources "/streams", StreamController, only: [:index]
+    end
 
     resources "/colors", ColorController, only: [:index]
   end
