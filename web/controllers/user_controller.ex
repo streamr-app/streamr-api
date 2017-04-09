@@ -13,7 +13,7 @@ defmodule Streamr.UserController do
 
     case Repo.insert(changeset) do
       {:ok, user} ->
-        send_welcome_email(user)
+        register_new_user(user)
 
         conn
         |> put_status(201)
@@ -102,6 +102,13 @@ defmodule Streamr.UserController do
     case Repo.delete(subscription) do
       {:ok, _} -> send_resp(conn, 204, "")
       {:error, error} -> conn |> put_status(400) |> render("errors.json-api", data: error)
+    end
+  end
+
+  def register_new_user(user) do
+    Task.Supervisor.start_child Streamr.UploadSupervisor, fn ->
+      Streamr.InitialCreator.process(user)
+      send_welcome_email(user)
     end
   end
 

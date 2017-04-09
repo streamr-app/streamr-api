@@ -18,6 +18,7 @@ defmodule Streamr.UserControllerTest do
       refute body["data"]["attributes"]["password_hash"]
     end
 
+    @tag :skip
     test "with valid user data, sends email for verification", %{conn: conn} do
       valid_user = :user |> params_for() |> with_password()
 

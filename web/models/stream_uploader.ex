@@ -32,7 +32,7 @@ defmodule Streamr.StreamUploader do
   end
 
   defp file_name_for(stream) do
-    "exports/stream_upload_data_#{stream.id}"
+    "uploads/stream_upload_data_#{stream.id}"
   end
 
   defp pg_link_pid do
@@ -46,7 +46,6 @@ defmodule Streamr.StreamUploader do
   end
 
   defp create_file(name) do
-    File.mkdir("exports")
     File.touch(name)
   end
 

@@ -7,6 +7,7 @@ defmodule Streamr.User do
     field :email, :string
     field :password, :string, virtual: true
     field :password_hash, :string
+    field :image_s3_key, :string
 
     has_many :streams, Streamr.Stream
     has_many :comment, Streamr.Comment, on_delete: :delete_all
@@ -35,6 +36,11 @@ defmodule Streamr.User do
     |> validate_required([:password])
     |> validate_length(:password, min: 6)
     |> put_pass_hash()
+  end
+
+  def image_key_changeset(s3_key, user) do
+    user
+    |> cast(%{image_s3_key: s3_key}, [:image_s3_key])
   end
 
   def find_and_confirm_password(email, password) do

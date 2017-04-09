@@ -4,7 +4,7 @@ elixir:
 otp_release:
   - 18.2.1
 script:
-  - mix test
+  - mix test --exclude skip
   - mix dogma
 addons:
   postgresql: 9.4
