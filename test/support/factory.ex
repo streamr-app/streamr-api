@@ -82,6 +82,14 @@ defmodule Streamr.Factory do
     }
   end
 
+  def vote_factory do
+    %Streamr.Vote{
+      user: build(:user),
+      stream: build(:stream),
+      comment: build(:comment),
+    }
+  end
+
   def set_password(user, password) do
     hashed_password = Comeonin.Bcrypt.hashpwsalt(password)
     %{user | password_hash: hashed_password}

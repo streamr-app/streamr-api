@@ -1,6 +1,7 @@
 defmodule Streamr.Stream do
   use Streamr.Web, :model
   use Timex.Ecto.Timestamps
+  use Streamr.Voteable
   alias Streamr.{Repo, UserSubscription}
   import Ecto.Query
 
@@ -11,6 +12,7 @@ defmodule Streamr.Stream do
     field :s3_key, :string
     field :duration, :integer
     field :published_at, Timex.Ecto.DateTime
+    field :votes_count, :integer, null: false, default: 0
 
     belongs_to :user, Streamr.User
     belongs_to :topic, Streamr.Topic
@@ -20,7 +22,7 @@ defmodule Streamr.Stream do
     timestamps()
   end
 
-  def changeset(model, params \\ :empty) do
+  def changeset(model, params \\ %{}) do
     model
     |> cast(params, [:title, :description])
     |> validate_required([:title])

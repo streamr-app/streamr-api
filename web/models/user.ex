@@ -18,10 +18,12 @@ defmodule Streamr.User do
     has_many :_subscriptions, Streamr.UserSubscription, foreign_key: :subscriber_id
     has_many :subscriptions, through: [:_subscriptions, :subscription]
 
+    has_many :votes, Streamr.Vote, on_delete: :delete_all
+
     timestamps()
   end
 
-  def changeset(model, params \\ :empty) do
+  def changeset(model, params \\ %{}) do
     model
     |> cast(params, [:name, :email])
     |> validate_required([:name, :email])
