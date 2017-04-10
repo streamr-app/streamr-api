@@ -10,6 +10,8 @@ defmodule Streamr.Comment do
     field :body, :string, null: false
     field :votes_count, :integer, null: false, default: 0
 
+    has_many :votes, Streamr.Vote, on_delete: :delete_all
+
     timestamps()
   end
 
@@ -19,9 +21,9 @@ defmodule Streamr.Comment do
     |> validate_required([:body])
   end
 
-  def with_users(query) do
+  def with_associations(query) do
     from comment in query,
-    preload: [:user],
+    preload: [:user, :votes],
     select: comment
   end
 

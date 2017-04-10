@@ -132,7 +132,7 @@ defmodule Streamr.StreamController do
   end
 
   defp with_associations(stream) do
-    Repo.preload(stream, [:user, :topic])
+    Repo.preload(stream, [:user, :topic, :votes])
   end
 
   defp get_stream(params) do

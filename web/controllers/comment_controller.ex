@@ -7,9 +7,9 @@ defmodule Streamr.CommentController do
 
   def index(conn, params) do
     comments = params["stream_id"]
-               |> Comment.for_stream
-               |> Comment.with_users
-               |> Comment.ordered
+               |> Comment.for_stream()
+               |> Comment.with_associations()
+               |> Comment.ordered()
                |> Repo.paginate(params)
 
     render(conn, "index.json-api", data: comments)
@@ -24,7 +24,7 @@ defmodule Streamr.CommentController do
       {:ok, comment} ->
         conn
         |> put_status(201)
-        |> render("show.json-api", data: Repo.preload(comment, :user))
+        |> render("show.json-api", data: Repo.preload(comment, [:user, :votes]))
 
       {:error, changeset} ->
         conn

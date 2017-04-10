@@ -18,6 +18,7 @@ defmodule Streamr.Stream do
     belongs_to :topic, Streamr.Topic
     has_one :stream_data, Streamr.StreamData, on_delete: :delete_all
     has_many :comment, Streamr.Comment, on_delete: :delete_all
+    has_many :votes, Streamr.Vote, on_delete: :delete_all
 
     timestamps()
   end
@@ -38,7 +39,7 @@ defmodule Streamr.Stream do
 
   def with_associations(query) do
     from stream in query,
-    preload: [:user, :topic],
+    preload: [:user, :topic, :votes],
     select: stream
   end
 
