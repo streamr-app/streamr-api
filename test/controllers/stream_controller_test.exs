@@ -192,6 +192,36 @@ defmodule Streamr.StreamControllerTest do
           assert Plug.Exception.status(exception) == 403
       end
     end
+
+    test "it prevents setting audio_s3_key to another stream's audio",
+    %{stream: stream, stream_params: stream_params} do
+      other_stream = insert(:stream)
+      stream_params = %{stream_params | audio_s3_key: "streams/#{other_stream.id}/foo"}
+
+      conn = put_authorized(stream.user, "/api/v1/streams/#{stream.id}", %{stream: stream_params})
+
+      assert conn.status == 422
+    end
+
+    test "it prevents setting audio_s3_key to nil" do
+      stream = insert(:stream)
+      stream_params = params_for(
+        :stream,
+        title: "updated",
+        description: "updated",
+        audio_s3_key: "streams/#{stream.id}/foo"
+      )
+
+      put_authorized(stream.user, "/api/v1/streams/#{stream.id}", %{stream: stream_params})
+
+      conn = put_authorized(
+        stream.user,
+        "/api/v1/streams/#{stream.id}",
+        %{stream: %{audio_s3_key: nil}}
+      )
+
+      assert conn.status == 422
+    end
   end
 
   describe "DELETE /api/v1/streams/:id" do

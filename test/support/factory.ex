@@ -25,7 +25,8 @@ defmodule Streamr.Factory do
       user: build(:user),
       title: sequence(:title, &"title-#{&1}"),
       description: sequence(:description, &"description-#{&1}"),
-      topic: build(:topic)
+      topic: build(:topic),
+      audio_s3_key: nil
     }
   end
 
