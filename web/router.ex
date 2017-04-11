@@ -39,6 +39,7 @@ defmodule Streamr.Router do
 
       post "/add_line", StreamController, :add_line
       post "/end", StreamController, :end_stream
+      post "/publish", StreamController, :publish
     end
 
     resources "/comments", CommentController, only: [:delete] do

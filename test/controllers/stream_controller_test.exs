@@ -6,21 +6,15 @@ defmodule Streamr.StreamControllerTest do
   alias Streamr.{Repo, Stream, StreamData}
 
   describe "GET /api/v1/streams" do
-    setup do
-      insert_list(2, :stream)
-
-      :ok
-    end
-
     test "it returns all streams" do
-      conn = get(
-        build_conn(),
-        "/api/v1/streams"
-      )
+      published_streams = insert_list(3, :stream)
+      _unpublished_streams = insert_list(3, :stream, published_at: nil)
 
-      response = json_response(conn, 200)["data"]
+      conn = get(build_conn(), "/api/v1/streams")
 
-      assert 2 == Enum.count(response)
+      response_ids = conn |> json_response(200) |> response_ids()
+
+      assert response_ids == model_ids(published_streams)
     end
   end
 
@@ -163,6 +157,45 @@ defmodule Streamr.StreamControllerTest do
         exception in Bodyguard.NotAuthorizedError ->
           assert Plug.Exception.status(exception) == 403
       end
+    end
+  end
+
+  describe "POST /api/v1/streams/:id/publish" do
+    test "it sets the stream's published_at to the current time" do
+      stream = insert(:stream)
+
+      conn = post_authorized(stream.user, "/api/v1/streams/#{stream.id}/publish")
+      response = json_response(conn, 200)["data"]
+
+      assert response["attributes"]["published-at"]
+    end
+
+    test "it allows the stream to show up in the stream index endpoint" do
+      stream = insert(:stream)
+
+      post_authorized(stream.user, "/api/v1/streams/#{stream.id}/publish")
+      conn = get(build_conn(), "/api/v1/streams")
+
+      response_ids = conn |> json_response(200) |> response_ids()
+
+      assert Enum.member?(response_ids, stream.id)
+    end
+
+    test "it prevents publishing another user's streams" do
+      stream = insert(:stream)
+
+      try do
+        post_authorized(insert(:user), "/api/v1/streams/#{stream.id}/publish")
+      rescue
+        exception in Bodyguard.NotAuthorizedError ->
+          assert Plug.Exception.status(exception) == 403
+      end
+    end
+
+    test "it requires the user to be signed in" do
+      conn = post(build_conn(), "/api/v1/streams/#{insert(:stream).id}/publish")
+
+      assert conn.status == 401
     end
   end
 

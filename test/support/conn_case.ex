@@ -53,6 +53,19 @@ defmodule Streamr.ConnCase do
         |> Guardian.Plug.api_sign_in(user)
         |> get(endpoint, body)
       end
+
+      def response_ids(response) do
+        response
+        |> Map.get("data")
+        |> Enum.map(fn(object) -> String.to_integer(object["id"]) end)
+        |> Enum.sort()
+      end
+
+      def model_ids(db_rows) do
+        db_rows
+        |> Enum.map(fn(object) -> object.id end)
+        |> Enum.sort()
+      end
     end
   end
 

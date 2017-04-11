@@ -26,7 +26,8 @@ defmodule Streamr.Factory do
       title: sequence(:title, &"title-#{&1}"),
       description: sequence(:description, &"description-#{&1}"),
       topic: build(:topic),
-      audio_s3_key: nil
+      audio_s3_key: nil,
+      published_at: Timex.now()
     }
   end
 
