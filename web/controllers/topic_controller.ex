@@ -3,9 +3,7 @@ defmodule Streamr.TopicController do
   alias Streamr.{Topic, Repo}
 
   def index(conn, params) do
-    topics = Topic
-    |> Topic.ordered
-    |> Repo.paginate(params)
+    topics = Topic |> Topic.ordered |> Repo.all()
 
     render(conn, "index.json-api", data: topics)
   end
