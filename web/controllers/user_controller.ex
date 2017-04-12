@@ -68,20 +68,20 @@ defmodule Streamr.UserController do
     |> render("email_available.json", email_available: !Repo.get_by(User, email: email))
   end
 
-  def me(conn, _assigns) do
+  def me(conn, _params) do
     render(conn, "show.json-api", data: Plug.current_resource(conn))
   end
 
-  def my_subscriptions(conn, _assigns) do
-    user = conn.assigns.current_user |> Repo.preload(:subscriptions)
+  def my_subscriptions(conn, params) do
+    subscriptions = conn.assigns.current_user |> User.subscriptions_for() |> Repo.paginate(params)
 
-    render(conn, "index.json-api", data: user.subscriptions)
+    render(conn, "index.json-api", data: subscriptions)
   end
 
-  def my_subscribers(conn, _assigns) do
-    user = conn.assigns.current_user |> Repo.preload(:subscribers)
+  def my_subscribers(conn, params) do
+    subscribers = conn.assigns.current_user |> User.subscribed_to() |> Repo.paginate(params)
 
-    render(conn, "index.json-api", data: user.subscribers)
+    render(conn, "index.json-api", data: subscribers)
   end
 
   def subscribe(conn, %{"user_id" => subscription_id}) do

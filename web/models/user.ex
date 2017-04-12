@@ -24,6 +24,18 @@ defmodule Streamr.User do
     timestamps()
   end
 
+  def subscriptions_for(user) do
+    from u in User,
+    join: sub in UserSubscription, on: sub.subscription_id == u.id,
+    where: sub.subscriber_id == ^user.id
+  end
+
+  def subscribed_to(user) do
+    from u in User,
+    join: sub in UserSubscription, on: sub.subscriber_id == u.id,
+    where: sub.subscription_id == ^user.id
+  end
+
   def changeset(model, params \\ %{}) do
     model
     |> cast(params, [:name, :email])
