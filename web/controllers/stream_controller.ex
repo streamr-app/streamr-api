@@ -1,6 +1,6 @@
 defmodule Streamr.StreamController do
   use Streamr.Web, :controller
-  alias Streamr.{Stream, Repo, StreamData, StreamUploader}
+  alias Streamr.{Stream, Repo, StreamData, StreamUploader, PreviewUploader}
 
   plug Streamr.Authenticate when action in [:create, :add_line, :subscribed, :end_stream, :publish]
 
@@ -71,7 +71,7 @@ defmodule Streamr.StreamController do
 
   def update(conn, %{"id" => id, "stream" => stream_params}) do
     stream = Repo.get!(Stream, id)
-    changeset = Stream.changeset(stream, stream_params)
+    changeset = update_changeset(stream, stream_params)
     conn = authorize!(conn, stream)
 
     case Repo.update(changeset) do
@@ -163,6 +163,18 @@ defmodule Streamr.StreamController do
 
   defp search_and_order(query, _params) do
     Stream.ordered(query)
+  end
+
+  defp update_changeset(stream, %{"preview_data" => preview_data} = params) do
+    image_s3_key = PreviewUploader.upload(stream, preview_data)
+
+    stream
+    |> Stream.image_changeset(image_s3_key)
+    |> Stream.changeset(params)
+  end
+
+  defp update_changeset(stream, params) do
+    Stream.changeset(stream, params)
   end
 
   defp streams_by_parent(%{"user_id" => user_id}), do: Stream.for_user(user_id)

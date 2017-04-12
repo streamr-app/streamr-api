@@ -7,7 +7,7 @@ defmodule Streamr.StreamView do
 
   attributes [
     :title, :description, :image, :data_url, :audio_data_url, :duration, :published_at,
-    :votes_count, :current_user_voted
+    :votes_count, :current_user_voted, :image_url
   ]
 
   has_one :user, serializer: UserView, include: true
@@ -19,6 +19,10 @@ defmodule Streamr.StreamView do
 
   def audio_data_url(stream, _conn) do
     UrlQualifier.cdn_url_for(stream.audio_s3_key)
+  end
+
+  def image_url(stream, _conn) do
+    UrlQualifier.cdn_url_for(stream.image_s3_key)
   end
 
   def current_user_voted(stream, conn) do

@@ -11,7 +11,7 @@ defmodule Streamr.Stream do
   schema "streams" do
     field :title, :string, null: false
     field :description, :string
-    field :image, :string
+    field :image_s3_key, :string
     field :s3_key, :string
     field :audio_s3_key, :string
     field :duration, :integer
@@ -51,9 +51,14 @@ defmodule Streamr.Stream do
 
   def changeset(stream, params \\ %{}) do
     stream
-    |> cast(params, [:title, :description, :audio_s3_key])
+    |> cast(params, [:title, :description, :audio_s3_key, :image_s3_key])
     |> validate_required([:title])
     |> validate_audio_belongs_to_stream(stream)
+  end
+
+  def image_changeset(stream, image_s3_key) do
+    stream
+    |> cast(%{image_s3_key: image_s3_key}, [:image_s3_key])
   end
 
   def duration_changeset(model) do
