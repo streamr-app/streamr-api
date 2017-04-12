@@ -3,10 +3,14 @@
 
 To start your Phoenix app:
 
-  * Install dependencies with `mix deps.get`
-  * Create and migrate your database with `mix ecto.create && mix ecto.migrate`
-  * Install Node.js dependencies with `npm install`
-  * Start Phoenix endpoint with `mix phoenix.server`
+  * Setup your project by running `$ bin/setup`
+  * Start Phoenix endpoint with `$ bin/server`
+  * Start up an interactive console with `$ bin/console`
+  * Connect to your database with `$ bin/db`
+  * Run tests and lint code with `$ bin/test`
+
+_Note: `bin/server` and `bin/test` can be run with the `-i` flag to allow for an
+interactive mode_
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
@@ -18,9 +22,9 @@ or what sort of response you should be receiving, you can always check the tests
 
 ## Contributing
 
-To contribute, put your changes inside a separate branch. Write some tests for it, validate
-that they work by running `mix test`, and ensure that your changes match our styleguide by
-running `mix dogma`. If everything passes, open up a Pull Request for review!
+To contribute, put your changes inside a separate branch. Write some tests for
+it, validate that they work and that your style matches our styleguide by
+running `$ bin/test`. If everything passes, open up a Pull Request for review!
 
 Travis CI is used to help ensure that no failing test or bad style gets past a review. If you
 haven't tested your code or linted it, Travis CI will catch it.

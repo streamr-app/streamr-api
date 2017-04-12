@@ -1,0 +1,6 @@
+#!/bin/bash 
+
+# Ensure db is up to date before opening db
+mix ecto.migrate
+
+psql -d streamr_dev

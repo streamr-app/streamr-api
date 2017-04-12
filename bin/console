@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ ! -f ".env" ] ; then
+  echo "You need a .env file to run the console."
+  exit 1
+fi
+
+# Ensure dependencies are up to date
+mix deps.get
+
+# Ensure db is up to date
+mix ecto.migrate
+
+source .env && iex -S mix

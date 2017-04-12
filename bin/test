@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [ ! -f ".env" ] ; then
+  echo "You need a .env file to run tests."
+  exit 1
+fi
+
+# Ensure dependencies are up to date
+mix deps.get
+
+# Ensure db is up to date
+MIX_ENV=test mix ecto.migrate
+
+# Lint your files
+mix credo --strict
+
+source .env 
+if [ "$1" == "-i" ] ; then
+  iex -S mix test
+else
+  mix test
+fi

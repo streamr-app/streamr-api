@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Create db
+mix ecto.create && mix ecto.migrate
+
+# Install dependencies
+mix deps.get
