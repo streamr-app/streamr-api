@@ -6,10 +6,10 @@ defmodule Streamr.StreamController do
 
   def index(conn, params) do
     streams = params
-              |> filtered_streams()
+              |> streams_by_parent()
               |> Stream.published()
+              |> search_and_order(params)
               |> Stream.with_associations()
-              |> Stream.ordered()
               |> Repo.paginate(params)
 
     render(conn, "index.json-api", data: streams)
@@ -19,8 +19,8 @@ defmodule Streamr.StreamController do
     streams = conn.assigns.current_user
               |> Stream.subscribed()
               |> Stream.published()
+              |> search_and_order(params)
               |> Stream.with_associations()
-              |> Stream.ordered()
               |> Repo.paginate(params)
 
     render(conn, "index.json-api", data: streams)
@@ -157,7 +157,15 @@ defmodule Streamr.StreamController do
     Repo.get!(Stream, Map.get(params, "stream_id"))
   end
 
-  defp filtered_streams(%{"user_id" => user_id}), do: Stream.for_user(user_id)
-  defp filtered_streams(%{"topic_id" => topic_id}), do: Stream.for_topic(topic_id)
-  defp filtered_streams(_params), do: Stream
+  defp search_and_order(query, %{"search" => search}) do
+    query |> Stream.search(search) |> Stream.ordered_by_search(search)
+  end
+
+  defp search_and_order(query, _params) do
+    Stream.ordered(query)
+  end
+
+  defp streams_by_parent(%{"user_id" => user_id}), do: Stream.for_user(user_id)
+  defp streams_by_parent(%{"topic_id" => topic_id}), do: Stream.for_topic(topic_id)
+  defp streams_by_parent(_params), do: Stream
 end
