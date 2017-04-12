@@ -1,7 +1,7 @@
 defmodule Streamr.RefreshToken do
   use Streamr.Web, :model
 
-  alias Streamr.{RefreshToken, Repo}
+  alias Streamr.{RefreshToken, Repo, SecureRandom}
   import Ecto.Query
 
   schema "refresh_tokens" do
@@ -35,7 +35,7 @@ defmodule Streamr.RefreshToken do
   end
 
   defp new_token_changeset(user) do
-    params = %{user_id: user.id, token: Streamr.SecureRandom.base64(256)}
+    params = %{user_id: user.id, token: SecureRandom.base64(256)}
 
     %RefreshToken{}
     |> cast(params, [:token, :user_id])

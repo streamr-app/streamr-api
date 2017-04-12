@@ -1,8 +1,7 @@
 defmodule Streamr.Voteable do
   import Ecto.Changeset
-  alias Streamr.Repo
 
-  defmacro __using__(opts \\ []) do
+  defmacro __using__(_) do
     quote do
       def change_votes_count_changeset(model, :increment) do
         model

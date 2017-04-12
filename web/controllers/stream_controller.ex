@@ -16,7 +16,7 @@ defmodule Streamr.StreamController do
   end
 
   def subscribed(conn, params) do
-    streams = conn.assigns[:current_user]
+    streams = conn.assigns.current_user
               |> Stream.subscribed()
               |> Stream.published()
               |> Stream.with_associations()
@@ -27,8 +27,7 @@ defmodule Streamr.StreamController do
   end
 
   def create(conn, %{"stream" => stream_params}) do
-    changeset = conn
-                |> Guardian.Plug.current_resource
+    changeset = conn.assigns.current_user
                 |> Ecto.build_assoc(:streams)
                 |> Stream.changeset(stream_params)
 

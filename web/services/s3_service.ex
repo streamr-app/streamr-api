@@ -1,5 +1,6 @@
 defmodule Streamr.S3Service do
   alias ExAws.S3
+  alias ExAws.S3.Upload
 
   @bucket_name System.get_env("AWS_S3_BUCKET_NAME")
 
@@ -7,7 +8,7 @@ defmodule Streamr.S3Service do
     resource_path = resource_path_for(model, local_path)
 
     local_path
-    |> S3.Upload.stream_file
+    |> Upload.stream_file
     |> S3.upload(@bucket_name, resource_path)
     |> ExAws.request!
 
@@ -21,7 +22,7 @@ defmodule Streamr.S3Service do
   defp hashed_contents(filepath) do
     filepath
     |> File.stream!()
-    |> Enum.reduce(:crypto.hash_init(:sha256), fn(line, acc) -> :crypto.hash_update(acc,line) end)
+    |> Enum.reduce(:crypto.hash_init(:sha256), fn(line, acc) -> :crypto.hash_update(acc, line) end)
     |> :crypto.hash_final
     |> Base.encode16
   end

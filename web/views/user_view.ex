@@ -1,21 +1,21 @@
 defmodule Streamr.UserView do
   use Streamr.Web, :view
   use JaSerializer.PhoenixView
-  alias Streamr.{Repo, User, UserSubscription}
+  alias Streamr.{Repo, UserSubscription, UrlQualifier}
 
   attributes [:name, :email, :current_user_subscribed, :image_url]
 
-  def current_user_subscribed(_user, %Plug.Conn{assigns: %{current_user: nil}}), do: false
-  def current_user_subscribed(user, %Plug.Conn{assigns: %{current_user: current_user}}) do
+  def current_user_subscribed(_subscription, %Plug.Conn{assigns: %{current_user: nil}}), do: false
+  def current_user_subscribed(subscription, %Plug.Conn{assigns: %{current_user: current_user}}) do
     if Ecto.assoc_loaded?(current_user.subscriptions) do
-      current_user.subscriptions.member?(user)
+      current_user.subscriptions.member?(subscription)
     else
-      !!Repo.get_by(UserSubscription, subscriber_id: current_user.id, subscription_id: user.id)
+      subscription_present?(current_user.id, subscription.id)
     end
   end
 
   def image_url(user, _conn) do
-    Streamr.UrlQualifier.cdn_url_for(user.image_s3_key)
+    UrlQualifier.cdn_url_for(user.image_s3_key)
   end
 
   def render("access_token.json", %{access_token: access_token}) do
@@ -51,5 +51,15 @@ defmodule Streamr.UserView do
 
   def render("email_available.json", %{email_available: email_available}) do
     %{email_available: email_available}
+  end
+
+  defp subscription_present?(subscriber_id, subscription_id) do
+    subscription = Repo.get_by(
+      UserSubscription,
+      subscriber_id: subscriber_id,
+      subscription_id: subscription_id
+    )
+
+    if subscription, do: true, else: false
   end
 end

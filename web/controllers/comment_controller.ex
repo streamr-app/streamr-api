@@ -51,7 +51,7 @@ defmodule Streamr.CommentController do
   defp build_comment(conn, stream_id) do
     %Comment{
       stream_id: String.to_integer(stream_id),
-      user_id: Guardian.Plug.current_resource(conn).id
+      user_id: conn.assigns.current_user.id
     }
   end
 end

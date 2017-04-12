@@ -44,7 +44,7 @@ defmodule Streamr.InitialCreator do
   defp text_color(background_color) do
     luminance = background_color |> extract_rgb() |> calculate_luminance()
 
-    if (luminance > 125), do: "#000000", else: "#ffffff"
+    if luminance > 125, do: "#000000", else: "#ffffff"
   end
 
   defp calculate_luminance([red, green, blue]) do

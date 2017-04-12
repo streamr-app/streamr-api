@@ -1,6 +1,5 @@
 defmodule Streamr.StreamUploader do
-  alias Streamr.Repo
-  alias Streamr.S3Service
+  alias Streamr.{Repo, S3Service}
 
   def process(stream) do
     stream

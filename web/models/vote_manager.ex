@@ -9,7 +9,7 @@ defmodule Streamr.VoteManager do
     |> Repo.transaction()
   end
 
-  def delete(user, vote) do
+  def delete(vote) do
     Multi.new
     |> Multi.delete(:vote, vote)
     |> Multi.update(:voteable, vote_quantity_changeset(vote, :decrement))
