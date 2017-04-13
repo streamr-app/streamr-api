@@ -10,13 +10,7 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-alias Streamr.{Repo, Topic, Stream, Color, StreamData}
-
-defmodule SeedHelpers do
-  def aws_url(path) do
-    "https://s3-us-west-2.amazonaws.com/streamr-staging/Seeds/" <> path
-  end
-end
+alias Streamr.{Repo, Topic, Color}
 
 Repo.delete_all Topic
 Repo.insert! %Topic{name: "Art History"}
@@ -36,88 +30,67 @@ Repo.insert! %Topic{name: "Physics"}
 Repo.insert! %Topic{name: "US History"}
 Repo.insert! %Topic{name: "World History"}
 
-Repo.delete_all StreamData
-Repo.delete_all Stream
-Repo.insert! %Stream{
-  title: "Electic Charge, Fields, and Potential pt. 1",
-  image: SeedHelpers.aws_url("Screen+Shot+2017-01-29+at+6.25.36+PM.png"),
-  user_id: 1
+normal_colors = %{
+  white: "#abb2bf",
+  red: "#e06c75",
+  orange: "#d19a66",
+  green: "#98c379",
+  blue: "#61afef",
+  purple: "#c678dd",
 }
 
-Repo.insert! %Stream{
-  title: "Electic Charge, Fields, and Potential pt. 2",
-  image: SeedHelpers.aws_url("Screen+Shot+2017-01-29+at+6.26.01+PM.png"),
-  user_id: 1
+deuteranopia_colors = %{
+  white: "#ffffff",
+  red: "#adedbd",
+  orange: "#d19a66",
+  green: "#9b9fa2",
+  blue: "#61afef",
+  purple: "#b940dd",
 }
 
-Repo.insert! %Stream{
-  title: "Half Life Into",
-  image: SeedHelpers.aws_url("Screen+Shot+2017-01-29+at+6.27.00+PM.png"),
-  user_id: 1
+protanopia_colors = %{
+  white: "#ffffff",
+  red: "#adedbd",
+  orange: "#d19a66",
+  green: "#9b9fa2",
+  blue: "#61afef",
+  purple: "#b940dd",
 }
 
-Repo.insert! %Stream{
-  title: "Linear Equations",
-  image: SeedHelpers.aws_url("Screen+Shot+2017-01-29+at+6.29.31+PM.png"),
-  user_id: 1
+tritanopia_colors = %{
+  white: "#ffffff",
+  red: "#adedbd",
+  orange: "#d19a66",
+  green: "#9b9fa2",
+  blue: "#61afef",
+  purple: "#c500ff",
 }
 
-Repo.insert! %Stream{
-  title: "Riemann Sum Proof",
-  image: SeedHelpers.aws_url("Screen+Shot+2017-01-29+at+6.30.04+PM.png"),
-  user_id: 1
-}
+color_orders = [
+  {:white, 1},
+  {:red, 2},
+  {:orange, 3},
+  {:green, 4},
+  {:blue, 5},
+  {:purple, 6}
+]
 
-Repo.insert! %Stream{
-  title: "Squeeze Theorem Explained",
-  image: SeedHelpers.aws_url("Screen+Shot+2017-01-29+at+6.34.46+PM.png"),
-  user_id: 1
-}
+Enum.each color_orders, fn {color_atom, order} ->
+  changes = %{
+    normal: normal_colors[color_atom],
+    protanopia: protanopia_colors[color_atom],
+    deuteranopia: deuteranopia_colors[color_atom],
+    tritanopia: tritanopia_colors[color_atom],
+    order: order
+  }
 
-Repo.insert! %Stream{
-  title: "Intro to Differential Equations",
-  image: SeedHelpers.aws_url("Screen+Shot+2017-01-29+at+6.36.42+PM.png"),
-  user_id: 1
-}
-
-Repo.insert! %Stream{
-  title: "R-squared Coefficient",
-  image: SeedHelpers.aws_url("Screen+Shot+2017-01-29+at+6.38.11+PM.png"),
-  user_id: 1
-}
-
-# Blue
-Repo.insert! %Color{
-  normal: "#61afef",
-  order: 5
-}
-
-# Red
-Repo.insert! %Color{
-  normal: "#e06c75",
-  order: 2
-}
-
-# Green
-Repo.insert! %Color{
-  normal: "#98c379",
-  order: 4
-}
-
-# Purps
-Repo.insert! %Color{
-  normal: "#c678dd",
-  order: 6
-}
-
-# Orange
-Repo.insert! %Color{
-  normal: "#d19a66",
-  order: 3
-}
-
-# White
-Repo.insert! %Color{
-  normal: "#abb2bf",
-  order: 1
-}
+  if color = Repo.get_by(Color, order: order) do
+    color
+    |> Color.changeset(changes)
+    |> Repo.update!()
+  else
+    %Color{}
+    |> Color.changeset(changes)
+    |> Repo.insert!()
+  end
+end

@@ -15,4 +15,8 @@ defmodule Streamr.Color do
     from color in query,
     order_by: [asc: color.order]
   end
+
+  def changeset(color, params \\ []) do
+    cast(color, params, [:normal, :deuteranopia, :protanopia, :tritanopia, :order])
+  end
 end
