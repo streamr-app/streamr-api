@@ -8,11 +8,11 @@ fi
 # Ensure dependencies are up to date
 mix deps.get
 
-# Ensure db is up to date
-mix ecto.migrate
-
 # Use the environment vars from .env
 source .env
+
+# Ensure db is up to date
+mix ecto.migrate
 
 if [ "$1" == "-i" ] ; then
   iex -S mix phoenix.server

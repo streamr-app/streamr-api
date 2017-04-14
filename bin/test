@@ -8,13 +8,14 @@ fi
 # Ensure dependencies are up to date
 mix deps.get
 
+source .env
+
 # Ensure db is up to date
 MIX_ENV=test mix ecto.migrate
 
 # Lint your files
 mix credo --strict
 
-source .env 
 if [ "$1" == "-i" ] ; then
   iex -S mix test
 else

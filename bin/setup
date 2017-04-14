@@ -1,5 +1,12 @@
 #!/bin/bash
 
+if [ ! -f ".env" ] ; then
+  echo "You need a .env file to setup the repo."
+  exit 1
+fi
+
+source .env
+
 # Create db
 mix ecto.create && mix ecto.migrate
 

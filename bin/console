@@ -8,7 +8,9 @@ fi
 # Ensure dependencies are up to date
 mix deps.get
 
+source .env
+
 # Ensure db is up to date
 mix ecto.migrate
 
-source .env && iex -S mix
+iex -S mix
