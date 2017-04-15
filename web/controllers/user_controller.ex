@@ -3,7 +3,8 @@ defmodule Streamr.UserController do
 
   alias Guardian.Plug
   alias Streamr.{
-    User, RefreshToken, Repo, Mailer, Email, UserSubscription, UploadSupervisor, InitialCreator
+    User, RefreshToken, Repo, Mailer, Email, UserSubscription, UploadSupervisor, InitialCreator,
+    ProfilePictureUploader
   }
 
   plug Streamr.Authenticate
@@ -162,11 +163,28 @@ defmodule Streamr.UserController do
     |> Mailer.deliver
   end
 
-  defp update_changeset(user, %{"password" => password} = params) do
-    User.registration_changeset(user, params)
+  defp update_changeset(user, params) do
+    user
+    |> User.changeset(params)
+    |> password_changeset(params)
+    |> image_changeset(user, params)
   end
 
-  defp update_changeset(user, params) do
-    User.changeset(user, params)
+  defp password_changeset(changeset, params) do
+    if Map.get(params, "password") do
+      User.registration_changeset(changeset, params)
+    else
+      changeset
+    end
+  end
+
+  defp image_changeset(changeset, user, params) do
+    if Map.get(params, "image") do
+      params["image"]
+      |> ProfilePictureUploader.upload(user)
+      |> User.image_key_changeset(user)
+    else
+      changeset
+    end
   end
 end
