@@ -73,7 +73,7 @@ defmodule Streamr.UserController do
   end
 
   def update(conn, %{"user" => user_params}) do
-    changeset = User.changeset(conn.assigns.current_user, user_params)
+    changeset = update_changeset(conn.assigns.current_user, user_params)
 
     case Repo.update(changeset) do
       {:ok, user} -> render(conn, "show.json-api", data: user)
@@ -160,5 +160,13 @@ defmodule Streamr.UserController do
     user
     |> Email.welcome
     |> Mailer.deliver
+  end
+
+  defp update_changeset(user, %{"password" => password} = params) do
+    User.registration_changeset(user, params)
+  end
+
+  defp update_changeset(user, params) do
+    User.changeset(user, params)
   end
 end
