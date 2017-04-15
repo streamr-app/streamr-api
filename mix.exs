@@ -78,7 +78,8 @@ defmodule Streamr.Mixfile do
       {:timex, "~> 3.0"},
       {:timex_ecto, "~> 3.0"},
       {:bodyguard, "~> 1.0.0"},
-      {:credo, "~> 0.7", only: [:dev, :test]}
+      {:credo, "~> 0.7", only: [:dev, :test]},
+      {:joken, "~> 1.1"},
     ]
   end
 

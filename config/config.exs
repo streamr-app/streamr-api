@@ -51,6 +51,8 @@ config :ex_aws,
 config :ex_aws, :s3,
   region: System.get_env("AWS_S3_REGION")
 
+config :streamr, :secret_key_base, System.get_env("SECRET_KEY_BASE")
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"

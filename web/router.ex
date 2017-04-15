@@ -19,6 +19,9 @@ defmodule Streamr.Router do
   scope "/api/v1", Streamr do
     pipe_through :api
 
+    post "/password_reset", PasswordResetController, :generate
+    put "/password_reset", PasswordResetController, :update_password
+
     post "/users/auth", UserController, :auth
     get "/users/email_available", UserController, :email_available
     get "/users/me", UserController, :me
