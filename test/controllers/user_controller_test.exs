@@ -211,6 +211,31 @@ defmodule Streamr.UserControllerTest do
     end
   end
 
+  describe "PATCH /api/v1/users/me" do
+    test "it updates the user associated with the auth token" do
+      me = insert(:user)
+
+      conn = put_authorized(me, "/api/v1/users/me", %{user: %{email: "foobity@doo.com"}})
+      response = json_response(conn, 200)["data"]
+
+      assert response["attributes"]["email"] == "foobity@doo.com"
+    end
+
+    test "it returns a 422 when the attributes are not valid" do
+      [me, other] = insert_list(2, :user)
+
+      conn = put_authorized(me, "/api/v1/users/me", %{user: %{email: other.email}})
+
+      assert conn.status == 422
+    end
+
+    test "it requires an auth token" do
+      conn = put(build_conn(), "/api/v1/users/me", %{user: %{email: "foobity@doo.com"}})
+
+      assert conn.status == 401
+    end
+  end
+
   describe "GET /api/v1/users/my_subscriptions" do
     test "returns users I subscribe to" do
       me = insert(:user)

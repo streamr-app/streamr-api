@@ -7,7 +7,7 @@ defmodule Streamr.UserController do
   }
 
   plug Streamr.Authenticate
-    when action in [:me, :my_subscribers, :my_subscriptions, :subscribe, :unsubscribe]
+    when action in [:me, :my_subscribers, :my_subscriptions, :subscribe, :unsubscribe, :update]
 
   plug :halt_if_subscribed when action in [:subscribe]
   plug :halt_if_unsubscribed when action in [:unsubscribe]
@@ -70,6 +70,15 @@ defmodule Streamr.UserController do
 
   def me(conn, _params) do
     render(conn, "show.json-api", data: Plug.current_resource(conn))
+  end
+
+  def update(conn, %{"user" => user_params}) do
+    changeset = User.changeset(conn.assigns.current_user, user_params)
+
+    case Repo.update(changeset) do
+      {:ok, user} -> render(conn, "show.json-api", data: user)
+      {:error, errors} -> conn |> put_status(422) |> render("errors.json-api", data: errors)
+    end
   end
 
   def my_subscriptions(conn, params) do
