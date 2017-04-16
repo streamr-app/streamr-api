@@ -21,7 +21,7 @@ config :streamr, Streamr.Endpoint,
 config :streamr, Streamr.Mailer,
   adapter: Swoosh.Adapters.Mailgun,
   api_key: System.get_env("MAILGUN_API_KEY"),
-  domain: "sandboxd11cf256d75a44d0bb0d42d938bae558.mailgun.org"
+  domain: System.get_env("MAILGUN_DOMAIN")
 
 # Configures Elixir's Logger
 config :logger, :console,
