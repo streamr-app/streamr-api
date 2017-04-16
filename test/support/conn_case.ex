@@ -56,8 +56,7 @@ defmodule Streamr.ConnCase do
 
       def response_ids(response) do
         response
-        |> Map.get("data")
-        |> Enum.map(fn(object) -> String.to_integer(object["id"]) end)
+        |> extract_ids_from_json()
         |> Enum.sort()
       end
 
@@ -65,6 +64,12 @@ defmodule Streamr.ConnCase do
         db_rows
         |> Enum.map(fn(object) -> object.id end)
         |> Enum.sort()
+      end
+
+      def extract_ids_from_json(response) do
+        response
+        |> Map.get("data")
+        |> Enum.map(fn(object) -> String.to_integer(object["id"]) end)
       end
     end
   end

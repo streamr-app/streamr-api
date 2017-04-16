@@ -49,6 +49,16 @@ defmodule Streamr.Stream do
     order_by: fragment("similarity(?, ?) DESC", stream.title, ^search)
   end
 
+  def trending(query) do
+    from stream in query,
+    where: stream.votes_count > 0,
+    order_by: fragment("""
+      (votes_count * log(votes_count + 1) +
+        extract(epoch from published_at))
+      / 45000 desc
+    """)
+  end
+
   def changeset(stream, params \\ %{}) do
     stream
     |> cast(params, [:title, :description, :topic_id, :audio_s3_key, :image_s3_key])

@@ -26,6 +26,16 @@ defmodule Streamr.StreamController do
     render(conn, "index.json-api", data: streams)
   end
 
+  def trending(conn, params) do
+    streams = Stream
+              |> Stream.published()
+              |> Stream.trending()
+              |> Stream.with_associations()
+              |> Repo.paginate(params)
+
+    render(conn, "index.json-api", data: streams)
+  end
+
   def create(conn, %{"stream" => stream_params}) do
     changeset = conn.assigns.current_user
                 |> Ecto.build_assoc(:streams)

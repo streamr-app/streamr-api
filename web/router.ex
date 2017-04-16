@@ -36,6 +36,7 @@ defmodule Streamr.Router do
     end
 
     get "/streams/subscribed", StreamController, :subscribed
+    get "/streams/trending", StreamController, :trending
     resources "/streams", StreamController do
       resources "/comments", CommentController, only: [:index, :create]
       post "/my_vote", VoteController, :create
