@@ -56,16 +56,9 @@ defmodule Streamr.Stream do
     |> validate_audio_belongs_to_stream(stream)
   end
 
-  def image_changeset(stream, image_s3_key) do
+  def stream_end_changeset(stream, params) do
     stream
-    |> cast(%{image_s3_key: image_s3_key}, [:image_s3_key])
-  end
-
-  def duration_changeset(model) do
-    duration = Timex.to_unix(Timex.now()) - Timex.to_unix(model.inserted_at)
-
-    model
-    |> cast(%{duration: duration}, [:duration])
+    |> cast(params, [:image_s3_key, :duration])
   end
 
   def publish_changeset(stream) do
