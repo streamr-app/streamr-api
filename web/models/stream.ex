@@ -51,7 +51,7 @@ defmodule Streamr.Stream do
 
   def changeset(stream, params \\ %{}) do
     stream
-    |> cast(params, [:title, :description, :audio_s3_key, :image_s3_key])
+    |> cast(params, [:title, :description, :topic_id, :audio_s3_key, :image_s3_key])
     |> validate_required([:title])
     |> validate_audio_belongs_to_stream(stream)
   end
