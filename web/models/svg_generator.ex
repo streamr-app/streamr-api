@@ -79,7 +79,7 @@ defmodule Streamr.SVGGenerator do
       from stream_data
       left join lateral unnest(lines) as line on true
       where stream_id = #{stream.id}
-      order by line->>'time' asc
+      order by (line->>'time')::int asc
     """
   end
 
