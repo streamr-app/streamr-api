@@ -37,7 +37,7 @@ config :mime, :types, %{
 
 config :guardian, Guardian,
   issuer: "Streamr",
-  ttl: { 1, :weeks },
+  ttl: { 7, :days },
   secret_key: %{
     "k" => System.get_env("SECRET_KEY_BASE"),
     "kty" => "oct"
