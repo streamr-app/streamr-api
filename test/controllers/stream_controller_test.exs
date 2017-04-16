@@ -154,6 +154,17 @@ defmodule Streamr.StreamControllerTest do
       stream = Repo.get(Stream, body["data"]["id"])
       assert StreamData.for_stream(stream).lines == []
     end
+
+    test "it upvotes the stream from the user's account" do
+      user = insert(:user)
+      valid_stream = params_for(:stream)
+
+      conn = post_authorized(user, "/api/v1/streams", %{stream: valid_stream})
+      id = json_response(conn, 201)["data"]["id"]
+      stream = Repo.get(Stream, id)
+
+      assert stream.votes_count == 1
+    end
   end
 
   describe "POST /api/v1/streams/:id/add_line" do

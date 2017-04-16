@@ -1,6 +1,6 @@
 defmodule Streamr.StreamController do
   use Streamr.Web, :controller
-  alias Streamr.{Stream, Repo, StreamData, StreamUploader, SVGUploader}
+  alias Streamr.{Stream, Repo, StreamData, StreamUploader, SVGUploader, VoteManager}
 
   plug Streamr.Authenticate when action in [:create, :add_line, :subscribed, :end_stream, :publish]
 
@@ -44,6 +44,7 @@ defmodule Streamr.StreamController do
     case Repo.insert(changeset) do
       {:ok, stream} ->
         StreamData.initialize_for(stream)
+        VoteManager.create(conn.assigns.current_user, %{"stream_id" => stream.id})
 
         conn
         |> put_status(201)
