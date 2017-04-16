@@ -6,6 +6,7 @@ defmodule Streamr.Factory do
     %Streamr.User{
       name: sequence(:username, &"User-#{&1}"),
       email: sequence(:email, &"example#{&1}@example.com"),
+      color_preference: :normal
     }
   end
 

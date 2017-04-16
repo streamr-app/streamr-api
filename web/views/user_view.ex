@@ -3,7 +3,7 @@ defmodule Streamr.UserView do
   use JaSerializer.PhoenixView
   alias Streamr.{Repo, UserSubscription, UrlQualifier}
 
-  attributes [:name, :email, :current_user_subscribed, :image_url]
+  attributes [:name, :email, :current_user_subscribed, :image_url, :color_preference]
 
   def current_user_subscribed(_subscription, %Plug.Conn{assigns: %{current_user: nil}}), do: false
   def current_user_subscribed(subscription, %Plug.Conn{assigns: %{current_user: current_user}}) do

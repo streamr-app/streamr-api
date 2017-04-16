@@ -80,6 +80,7 @@ defmodule Streamr.Mixfile do
       {:bodyguard, "~> 1.0.0"},
       {:credo, "~> 0.7", only: [:dev, :test]},
       {:joken, "~> 1.1"},
+      {:ecto_enum, "~> 1.0"},
     ]
   end
 

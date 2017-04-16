@@ -9,6 +9,7 @@ defmodule Streamr.User do
     field :password, :string, virtual: true
     field :password_hash, :string
     field :image_s3_key, :string
+    field :color_preference, Streamr.ColorPreferenceEnum
 
     has_many :streams, Stream
     has_many :comment, Comment, on_delete: :delete_all
@@ -38,7 +39,7 @@ defmodule Streamr.User do
 
   def changeset(model, params \\ %{}) do
     model
-    |> cast(params, [:name, :email])
+    |> cast(params, [:name, :email, :color_preference])
     |> validate_required([:name, :email])
     |> validate_length(:email, min: 1, max: 254)
     |> validate_email_uniqueness

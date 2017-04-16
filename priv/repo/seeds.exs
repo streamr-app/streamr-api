@@ -31,7 +31,7 @@ Repo.insert! %Topic{name: "US History"}
 Repo.insert! %Topic{name: "World History"}
 
 normal_colors = %{
-  white: "#abb2bf",
+  white: "#d4d8e0",
   red: "#e06c75",
   orange: "#d19a66",
   green: "#98c379",
