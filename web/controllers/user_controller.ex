@@ -182,7 +182,7 @@ defmodule Streamr.UserController do
     if Map.get(params, "image") do
       params["image"]
       |> ProfilePictureUploader.upload(user)
-      |> User.image_key_changeset(user)
+      |> User.image_key_changeset(changeset)
     else
       changeset
     end
