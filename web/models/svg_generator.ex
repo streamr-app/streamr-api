@@ -2,12 +2,16 @@ defmodule Streamr.SVGGenerator do
   import Ecto.Query
 
   alias Streamr.{Repo, Color}
+  alias Ecto.Adapters.SQL
 
   def generate(stream) do
     filepath = filepath_for(stream)
+    undo_table_name = undo_table_name_for(stream)
 
+    create_undos_table(stream, undo_table_name)
     create_file(filepath)
-    create_svg(stream, filepath)
+    create_svg(stream, filepath, undo_table_name)
+    drop_undos_table(undo_table_name)
     add_footer(filepath)
     convert_to_png(filepath)
   end
@@ -29,12 +33,12 @@ defmodule Streamr.SVGGenerator do
     File.write!(filepath, svg_header())
   end
 
-  defp create_svg(stream, filepath) do
+  defp create_svg(stream, filepath, undo_table_name) do
     color_map = generate_color_map()
 
     Postgrex.transaction(pg_link_pid(), fn(conn) ->
       conn
-      |> Postgrex.stream(io_query(conn, stream), [])
+      |> Postgrex.stream(io_query(conn, stream, undo_table_name), [])
       |> Enum.into(File.stream!(filepath, [:append]), pg_result_to_io(color_map))
     end)
   end
@@ -69,16 +73,19 @@ defmodule Streamr.SVGGenerator do
     ~s(<path stroke="#{color}" stroke-width="#{width}" d="M#{path}"></path>)
   end
 
-  defp io_query(conn, stream) do
-    Postgrex.prepare!(conn, "", "copy (#{stream_data_query(stream)}) to stdout")
+  defp io_query(conn, stream, undo_table_name) do
+    Postgrex.prepare!(conn, "", "copy (#{stream_data_query(stream, undo_table_name)}) to stdout")
   end
 
-  def stream_data_query(stream) do
+  def stream_data_query(stream, undo_table_name) do
     """
       select line
       from stream_data
       left join lateral unnest(lines) as line on true
+      left join #{undo_table_name} on #{undo_table_name}.undo->>'line_id' = line->>'line_id'
       where stream_id = #{stream.id}
+        and line->>'type' = 'line'
+        and #{undo_table_name}.undo is null
       order by (line->>'time')::int asc
     """
   end
@@ -86,7 +93,7 @@ defmodule Streamr.SVGGenerator do
   defp svg_header do
     """
       <svg viewBox="0 0 1920 1080"><g fill="none">
-        <rect x="0" y="0" width="1920" height="1080" fill="#000000"></rect>
+        <rect x="0" y="0" width="1920" height="1080" fill="rgb(25,28,32)"></rect>
     """
   end
 
@@ -105,5 +112,26 @@ defmodule Streamr.SVGGenerator do
   defp generate_color_map do
     Repo.all(from c in Color, select: {c.id, c.normal})
     |> Enum.into(%{})
+  end
+
+  defp undo_table_name_for(stream) do
+    "svg_generation_data_#{stream.id}"
+  end
+
+  defp create_undos_table(stream, table_name) do
+    SQL.query!(
+      Repo,
+      """
+       create table if not exists #{table_name} as
+       select line as undo from stream_data
+       left join lateral unnest(lines) as line on true
+       where stream_id = #{stream.id}
+         and line->>'type' = 'undo'
+      """
+    )
+  end
+
+  defp drop_undos_table(undo_table_name) do
+    SQL.query(Repo, "drop table #{undo_table_name}")
   end
 end
