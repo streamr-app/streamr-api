@@ -20,9 +20,10 @@ defmodule Streamr.SVGGenerator do
     new_filepath = String.replace_trailing(filepath, ".svg", ".png")
 
     System.cmd("convert", [
+      filepath,
       "-size", "1920x1080",
-      "-interlace", "plane",
-      filepath, new_filepath
+      "-colorspace", "RGB",
+      new_filepath
     ])
 
     new_filepath
@@ -76,7 +77,7 @@ defmodule Streamr.SVGGenerator do
   defp svg_header do
     """
       <svg viewBox="0 0 1920 1080"><g fill="none">
-        <rect x="0" y="0" width="1920" height="1080" fill="rgb(25,28,32)"></rect>
+        <rect x="0" y="0" width="1920" height="1080" fill="rgb(19,22,27)"></rect>
     """
   end
 
