@@ -36,45 +36,28 @@ defmodule Streamr.SVGGenerator do
   defp create_svg(stream, filepath, undo_table_name) do
     color_map = generate_color_map()
 
-    Postgrex.transaction(pg_link_pid(), fn(conn) ->
-      conn
-      |> Postgrex.stream(io_query(conn, stream, undo_table_name), [])
-      |> Enum.into(File.stream!(filepath, [:append]), pg_result_to_io(color_map))
-    end)
-  end
-
-  defp pg_link_pid do
-    repo_config()
-    |> Postgrex.start_link()
-    |> elem(1)
-  end
-
-  defp repo_config do
-    Application.get_env(:streamr, Repo)
+    Repo
+    |> SQL.query!(stream_data_query(stream, undo_table_name))
+    |> Map.get(:rows)
+    |> Parallel.pmap(pg_result_to_io(color_map))
+    |> Enum.into(File.stream!(filepath, [:append]))
   end
 
   defp pg_result_to_io(color_map) do
-    fn %Postgrex.Result{rows: rows} ->
-      Enum.map(rows, &(generate_svg_path(&1, color_map)))
-    end
+    fn [row] -> generate_svg_path(row, color_map) end
   end
 
   defp generate_svg_path(row, color_map) do
-    decoded_row = Poison.decode!(row)
+    color = Map.get(color_map, String.to_integer(row["color_id"]))
+    width = Map.get(row, "thickness") + 2
+    suffix = line_cap(row)
 
-    color = Map.get(color_map, String.to_integer(decoded_row["color_id"]))
-    width = Map.get(decoded_row, "thickness") + 2
-
-    path = decoded_row
+    path = row
     |> Map.get("points")
     |> Enum.map(fn point -> "#{point["x"] * 1920},#{point["y"] * 1080}" end)
     |> Enum.join("L")
 
-    ~s(<path stroke="#{color}" stroke-width="#{width}" d="M#{path}"></path>)
-  end
-
-  defp io_query(conn, stream, undo_table_name) do
-    Postgrex.prepare!(conn, "", "copy (#{stream_data_query(stream, undo_table_name)}) to stdout")
+    ~s(<path stroke="#{color}" stroke-width="#{width}" d="M#{path}#{suffix}"></path>)
   end
 
   def stream_data_query(stream, undo_table_name) do
@@ -133,5 +116,9 @@ defmodule Streamr.SVGGenerator do
 
   defp drop_undos_table(undo_table_name) do
     SQL.query(Repo, "drop table #{undo_table_name}")
+  end
+
+  defp line_cap(row) do
+    if Enum.count(row["points"]) == 1, do: "Z"
   end
 end
