@@ -36,9 +36,10 @@ defmodule Streamr.SVGGenerator do
 
   defp create_svg(stream, filepath, undo_table_name) do
     color_map = generate_color_map()
+    last_clear_event_time = determine_last_clear_time(stream)
 
     Repo
-    |> SQL.query!(stream_data_query(stream, undo_table_name))
+    |> SQL.query!(stream_data_query(stream, undo_table_name, last_clear_event_time))
     |> Map.get(:rows)
     |> Parallel.pmap(pg_result_to_io(color_map))
     |> Enum.into(File.stream!(filepath, [:append]))
@@ -61,7 +62,7 @@ defmodule Streamr.SVGGenerator do
     ~s(<path stroke="#{color}" stroke-width="#{width}" d="M#{path}#{suffix}"></path>)
   end
 
-  def stream_data_query(stream, undo_table_name) do
+  def stream_data_query(stream, undo_table_name, latest_clear_event) do
     """
       select line
       from stream_data
@@ -70,6 +71,7 @@ defmodule Streamr.SVGGenerator do
       where stream_id = #{stream.id}
         and line->>'type' = 'line'
         and #{undo_table_name}.undo is null
+        and (line->>'time')::int > #{latest_clear_event}
       order by (line->>'time')::int asc
     """
   end
@@ -121,5 +123,20 @@ defmodule Streamr.SVGGenerator do
 
   defp line_cap(row) do
     if Enum.count(row["points"]) == 1, do: "Z"
+  end
+
+  defp determine_last_clear_time(stream) do
+    %{rows: [[time]]} = SQL.query!(
+      Repo,
+      """
+        select coalesce(max((line->>'time')::int), 0)
+        from stream_data
+        left join lateral unnest(lines) as line on true
+        where stream_id = #{stream.id}
+          and line->>'type' = 'clear'
+      """
+    )
+
+    time
   end
 end
