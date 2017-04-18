@@ -3,7 +3,7 @@ defmodule Streamr.UserController do
 
   alias Guardian.Plug
   alias Streamr.{
-    User, RefreshToken, Repo, Mailer, Email, UserSubscription, UploadSupervisor, InitialCreator,
+    User, RefreshToken, Repo, Mailer, Email, UserSubscription, InitialCreator,
     ProfilePictureUploader
   }
 
@@ -120,7 +120,7 @@ defmodule Streamr.UserController do
   end
 
   def register_new_user(user) do
-    Supervisor.start_child UploadSupervisor, fn ->
+    Task.start_link fn ->
       InitialCreator.process(user)
       send_welcome_email(user)
     end

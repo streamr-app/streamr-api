@@ -62,6 +62,7 @@ defmodule Streamr.InitialCreator do
     names
     |> limit_names()
     |> Enum.reduce("", fn(name, initials) -> initials <> String.first(name) end)
+    |> String.upcase()
   end
 
   defp filepath_for(user), do: "uploads/user_initials_#{user.id}.png"
