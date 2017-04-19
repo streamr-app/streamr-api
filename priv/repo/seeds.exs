@@ -12,23 +12,25 @@
 
 alias Streamr.{Repo, Topic, Color}
 
-Repo.delete_all Topic
-Repo.insert! %Topic{name: "Art History"}
-Repo.insert! %Topic{name: "Biology"}
-Repo.insert! %Topic{name: "Chemistry"}
-Repo.insert! %Topic{name: "Computer Science"}
-Repo.insert! %Topic{name: "Cosmology & Astronomy"}
-Repo.insert! %Topic{name: "Electrical Engineering"}
-Repo.insert! %Topic{name: "Entrepreneurship"}
-Repo.insert! %Topic{name: "Grammar"}
-Repo.insert! %Topic{name: "Health & Medicine"}
-Repo.insert! %Topic{name: "Macroeconomics"}
-Repo.insert! %Topic{name: "Microeconomics"}
-Repo.insert! %Topic{name: "Music"}
-Repo.insert! %Topic{name: "Organic Chemistry"}
-Repo.insert! %Topic{name: "Physics"}
-Repo.insert! %Topic{name: "US History"}
-Repo.insert! %Topic{name: "World History"}
+if Repo.aggregate(Topic, :count, :id) == 0 do
+  Repo.delete_all Topic
+  Repo.insert! %Topic{name: "Art History"}
+  Repo.insert! %Topic{name: "Biology"}
+  Repo.insert! %Topic{name: "Chemistry"}
+  Repo.insert! %Topic{name: "Computer Science"}
+  Repo.insert! %Topic{name: "Cosmology & Astronomy"}
+  Repo.insert! %Topic{name: "Electrical Engineering"}
+  Repo.insert! %Topic{name: "Entrepreneurship"}
+  Repo.insert! %Topic{name: "Grammar"}
+  Repo.insert! %Topic{name: "Health & Medicine"}
+  Repo.insert! %Topic{name: "Macroeconomics"}
+  Repo.insert! %Topic{name: "Microeconomics"}
+  Repo.insert! %Topic{name: "Music"}
+  Repo.insert! %Topic{name: "Organic Chemistry"}
+  Repo.insert! %Topic{name: "Physics"}
+  Repo.insert! %Topic{name: "US History"}
+  Repo.insert! %Topic{name: "World History"}
+end
 
 normal_colors = %{
   white: "#d4d8e0",
@@ -41,29 +43,29 @@ normal_colors = %{
 
 deuteranopia_colors = %{
   white: "#ffffff",
-  red: "#adedbd",
-  orange: "#d19a66",
-  green: "#9b9fa2",
-  blue: "#61afef",
-  purple: "#b940dd",
+  red: "#fb52e6",
+  orange: "#f0e442",
+  green: "#08dda3",
+  blue: "#6e92ff",
+  purple: "#4552f7",
 }
 
 protanopia_colors = %{
   white: "#ffffff",
-  red: "#adedbd",
-  orange: "#d19a66",
-  green: "#9b9fa2",
+  red: "#fb52e6",
+  orange: "#f0e442",
+  green: "#08dda3",
   blue: "#61afef",
   purple: "#b940dd",
 }
 
 tritanopia_colors = %{
   white: "#ffffff",
-  red: "#adedbd",
-  orange: "#d19a66",
-  green: "#9b9fa2",
-  blue: "#61afef",
-  purple: "#c500ff",
+  red: "#ff6320",
+  orange: "#dd9f00",
+  green: "#adedbd",
+  blue: "#6199ee",
+  purple: "#b4b8bb",
 }
 
 color_orders = [
