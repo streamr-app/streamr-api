@@ -1,6 +1,8 @@
 defmodule Streamr.InitialCreator do
   alias Streamr.{S3Service, User, Repo}
 
+  @font_path Path.join([System.cwd(), ".imagemagick-assets", "Roboto-Regular.ttf"])
+
   def process(user) do
     filepath = filepath_for(user)
 
@@ -26,6 +28,7 @@ defmodule Streamr.InitialCreator do
         "-size", "1536x1536",
         "canvas:##{background_color}",
         "-fill", text_color(background_color),
+        "-font", @font_path,
         "-pointsize", "200",
         "-gravity", "center",
         "-annotate", "+0+25", initials,
