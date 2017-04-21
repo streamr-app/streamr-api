@@ -66,7 +66,7 @@ defmodule Streamr.UserController do
 
   def email_available(conn, %{"email" => email}) do
     conn
-    |> render("email_available.json", email_available: false)
+    |> render("email_available.json", email_available: !Repo.get_by(User, email: email))
   end
 
   def me(conn, _params) do
