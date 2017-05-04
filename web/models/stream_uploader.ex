@@ -32,7 +32,7 @@ defmodule Streamr.StreamUploader do
   end
 
   defp file_name_for(stream) do
-    "uploads/stream_upload_data_#{stream.id}"
+    "uploads/stream_upload_data_#{stream.id}.txt"
   end
 
   defp create_file(name) do
