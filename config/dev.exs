@@ -48,3 +48,5 @@ config :guardian, Guardian,
     "kty" => "oct"
   },
   serializer: Streamr.GuardianSerializer
+
+config :ex_aws, debug_requests: true

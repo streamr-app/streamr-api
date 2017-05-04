@@ -71,9 +71,14 @@ defmodule Streamr.SVGGenerator do
       where stream_id = #{stream.id}
         and line->>'type' = 'line'
         and #{undo_table_name}.undo is null
-        and (line->>'time')::int > #{latest_clear_event}
+        #{limit_by_clear_event(latest_clear_event)}
       order by (line->>'time')::int asc
     """
+  end
+
+  defp limit_by_clear_event(nil), do: nil
+  defp limit_by_clear_event(clear_event_time) do
+    "and (line->>'time')::int > #{clear_event_time}"
   end
 
   defp svg_header do
@@ -129,7 +134,7 @@ defmodule Streamr.SVGGenerator do
     %{rows: [[time]]} = SQL.query!(
       Repo,
       """
-        select coalesce(max((line->>'time')::int), 0)
+        select max((line->>'time')::int)
         from stream_data
         left join lateral unnest(lines) as line on true
         where stream_id = #{stream.id}
