@@ -178,9 +178,9 @@ defmodule Streamr.StreamController do
 
   defp stream_end_changeset(stream) do
     duration = Timex.to_unix(Timex.now()) - Timex.to_unix(stream.inserted_at)
-    image_s3_key = SVGUploader.upload(stream)
+    image_s3_keys = SVGUploader.upload(stream)
 
-    Stream.stream_end_changeset(stream, %{duration: duration, image_s3_key: image_s3_key})
+    Stream.stream_end_changeset(stream, %{duration: duration, image_s3_keys: image_s3_keys})
   end
 
   defp streams_by_parent(%{"user_id" => user_id}), do: Stream.for_user(user_id)

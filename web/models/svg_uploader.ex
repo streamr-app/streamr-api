@@ -4,6 +4,12 @@ defmodule Streamr.SVGUploader do
   def upload(stream) do
     stream
     |> SVGGenerator.generate()
-    |> S3Service.upload_file(stream)
+    |> upload_files(stream)
+  end
+
+  defp upload_files(filepaths_map, stream) do
+    Parallel.pupdate filepaths_map, fn filepath ->
+      S3Service.upload_file(filepath, stream)
+    end
   end
 end

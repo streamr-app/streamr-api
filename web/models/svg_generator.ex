@@ -1,48 +1,58 @@
 defmodule Streamr.SVGGenerator do
-  import Ecto.Query
-
   alias Streamr.{Repo, Color}
   alias Ecto.Adapters.SQL
 
   def generate(stream) do
-    filepath = filepath_for(stream)
-    undo_table_name = undo_table_name_for(stream)
+    filepaths = filepaths_for(stream)
 
-    create_undos_table(stream, undo_table_name)
-    create_file(filepath)
-    create_svg(stream, filepath, undo_table_name)
-    drop_undos_table(undo_table_name)
-    add_footer(filepath)
-    convert_to_png(filepath)
+    create_files(filepaths)
+    draw_svg_paths(stream, filepaths)
+    add_footer(filepaths)
+    convert_to_png(filepaths)
   end
 
-  defp convert_to_png(filepath) do
-    new_filepath = String.replace_trailing(filepath, ".svg", ".png")
+  defp convert_to_png(filepaths) do
+    Parallel.pupdate filepaths, fn filepath ->
+      new_filepath = String.replace_trailing(filepath, ".svg", ".png")
 
-    System.cmd("convert", [
-      filepath,
-      "-size", "1920x1080",
-      "-colorspace", "RGB",
+      System.cmd("convert", [
+        filepath,
+        "-size", "1920x1080",
+        "-colorspace", "RGB",
+        new_filepath
+      ])
+
       new_filepath
-    ])
-
-    new_filepath
+    end
   end
 
-  defp create_file(filepath) do
-    File.touch(filepath)
-    File.write!(filepath, svg_header())
+  defp create_files(filepaths) do
+    Enum.each Map.values(filepaths), fn filepath ->
+      File.touch(filepath)
+      File.write!(filepath, svg_header())
+    end
   end
 
-  defp create_svg(stream, filepath, undo_table_name) do
+  defp draw_svg_paths(stream, filepaths) do
+    stream
+    |> generate_svg_paths()
+    |> write_to_svgs(filepaths)
+  end
+
+  defp write_to_svgs(svg_paths, filepaths) do
+    Parallel.peach filepaths, fn {palette, filepath} ->
+      Enum.into(svg_paths, File.stream!(filepath, [:append]), fn (row) -> row[palette] end)
+    end
+  end
+
+  defp generate_svg_paths(stream) do
     color_map = generate_color_map()
     last_clear_event_time = determine_last_clear_time(stream)
 
     Repo
-    |> SQL.query!(stream_data_query(stream, undo_table_name, last_clear_event_time))
+    |> SQL.query!(stream_data_query(stream, last_clear_event_time))
     |> Map.get(:rows)
     |> Parallel.pmap(pg_result_to_io(color_map))
-    |> Enum.into(File.stream!(filepath, [:append]))
   end
 
   defp pg_result_to_io(color_map) do
@@ -50,27 +60,33 @@ defmodule Streamr.SVGGenerator do
   end
 
   defp generate_svg_path(row, color_map) do
-    color = Map.get(color_map, String.to_integer(row["color_id"]))
     width = Map.get(row, "thickness") + 2
     suffix = line_cap(row)
+    color_id = String.to_integer(row["color_id"])
 
-    path = row
+    row
     |> Map.get("points")
     |> Enum.map(fn point -> "#{point["x"] * 1920},#{point["y"] * 1080}" end)
     |> Enum.join("L")
-
-    ~s(<path stroke="#{color}" stroke-width="#{width}" d="M#{path}#{suffix}"></path>)
+    |> generate_possible_paths(color_id, color_map, width, suffix)
   end
 
-  def stream_data_query(stream, undo_table_name, latest_clear_event) do
+  defp generate_possible_paths(path, color_id, color_map, width, suffix) do
+    Map.new Color.palettes, fn palette ->
+      color = color_map[color_id][palette]
+
+      {palette, ~s(<path stroke="#{color}" stroke-width="#{width}" d="M#{path}#{suffix}"></path>)}
+    end
+  end
+
+  defp stream_data_query(stream, latest_clear_event) do
     """
       select line
       from stream_data
       left join lateral unnest(lines) as line on true
-      left join #{undo_table_name} on #{undo_table_name}.undo->>'line_id' = line->>'line_id'
       where stream_id = #{stream.id}
         and line->>'type' = 'line'
-        and #{undo_table_name}.undo is null
+        and line->>'line_id' not in (#{undo_events(stream)})
         #{limit_by_clear_event(latest_clear_event)}
       order by (line->>'time')::int asc
     """
@@ -92,38 +108,45 @@ defmodule Streamr.SVGGenerator do
     "</g></svg>"
   end
 
-  defp add_footer(filepath) do
-    File.write!(filepath, svg_footer(), [:append])
+  defp add_footer(filepaths) do
+    Enum.each Map.values(filepaths), fn filepath ->
+      File.write!(filepath, svg_footer(), [:append])
+    end
   end
 
-  defp filepath_for(stream) do
-    "uploads/stream_preview_#{stream.id}.svg"
+  defp filepaths_for(stream) do
+    Color.palettes
+    |> Enum.zip(unique_filenames(stream))
+    |> Map.new()
   end
 
-  defp generate_color_map do
-    Repo.all(from c in Color, select: {c.id, c.normal})
-    |> Enum.into(%{})
+  defp unique_filenames(stream) do
+    Enum.map Color.palettes, fn (palette) ->
+      "uploads/stream_preview_#{stream.id}_" <> Atom.to_string(palette) <> ".svg"
+    end
   end
 
-  defp undo_table_name_for(stream) do
-    "svg_generation_data_#{stream.id}"
+  def generate_color_map do
+    Map.new Repo.all(Color), fn (color) ->
+      {
+        color.id,
+        %{
+          normal: color.normal,
+          deuteranopia: color.deuteranopia,
+          protanopia: color.protanopia,
+          tritanopia: color.tritanopia
+        }
+      }
+    end
   end
 
-  defp create_undos_table(stream, table_name) do
-    SQL.query!(
-      Repo,
-      """
-       create table if not exists #{table_name} as
-       select line as undo from stream_data
-       left join lateral unnest(lines) as line on true
-       where stream_id = #{stream.id}
-         and line->>'type' = 'undo'
-      """
-    )
-  end
-
-  defp drop_undos_table(undo_table_name) do
-    SQL.query(Repo, "drop table #{undo_table_name}")
+  defp undo_events(stream) do
+    """
+      select line->>'line_id' from stream_data
+      left join lateral unnest(lines) as line on true
+      where stream_id = #{stream.id}
+        and line->>'type' = 'undo'
+    """
   end
 
   defp line_cap(row) do

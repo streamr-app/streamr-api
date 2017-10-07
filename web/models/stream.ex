@@ -17,6 +17,7 @@ defmodule Streamr.Stream do
     field :duration, :integer
     field :published_at, Timex.Ecto.DateTime
     field :votes_count, :integer, null: false, default: 0
+    field :image_s3_keys, :map
 
     belongs_to :user, Streamr.User
     belongs_to :topic, Streamr.Topic
@@ -61,14 +62,14 @@ defmodule Streamr.Stream do
 
   def changeset(stream, params \\ %{}) do
     stream
-    |> cast(params, [:title, :description, :topic_id, :audio_s3_key, :image_s3_key])
+    |> cast(params, [:title, :description, :topic_id, :audio_s3_key, :image_s3_keys])
     |> validate_required([:title])
     |> validate_audio_belongs_to_stream(stream)
   end
 
   def stream_end_changeset(stream, params) do
     stream
-    |> cast(params, [:image_s3_key, :duration])
+    |> cast(params, [:image_s3_keys, :duration])
   end
 
   def publish_changeset(stream) do

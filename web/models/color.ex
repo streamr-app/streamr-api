@@ -19,4 +19,8 @@ defmodule Streamr.Color do
   def changeset(color, params \\ []) do
     cast(color, params, [:normal, :deuteranopia, :protanopia, :tritanopia, :order])
   end
+
+  def palettes do
+    [:normal, :deuteranopia, :protanopia, :tritanopia]
+  end
 end

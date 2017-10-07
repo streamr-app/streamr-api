@@ -28,7 +28,13 @@ defmodule Streamr.Factory do
       description: sequence(:description, &"description-#{&1}"),
       topic: build(:topic),
       audio_s3_key: nil,
-      published_at: Timex.now()
+      published_at: Timex.now(),
+      image_s3_keys: %{
+        normal: "normal.png",
+        deuteranopia: "deuteranopia.png",
+        tritanopia: "tritanopia.png",
+        protanopia: "protanopia.png"
+      }
     }
   end
 

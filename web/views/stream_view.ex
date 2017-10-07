@@ -3,7 +3,7 @@ defmodule Streamr.StreamView do
   use JaSerializer.PhoenixView
   use Streamr.Sluggifier, attribute: :title
 
-  alias Streamr.{UserView, TopicView, UrlQualifier, UserVoteView}
+  alias Streamr.{UserView, TopicView, UrlQualifier, UserVoteView, StreamImageSelector}
 
   attributes [
     :title, :description, :image, :data_url, :audio_data_url, :duration, :published_at,
@@ -21,8 +21,10 @@ defmodule Streamr.StreamView do
     UrlQualifier.cdn_url_for(stream.audio_s3_key)
   end
 
-  def image_url(stream, _conn) do
-    UrlQualifier.cdn_url_for(stream.image_s3_key)
+  def image_url(stream, conn) do
+    stream.image_s3_keys
+    |> StreamImageSelector.select_for(conn.assigns.current_user)
+    |> UrlQualifier.cdn_url_for()
   end
 
   def current_user_voted(stream, conn) do
